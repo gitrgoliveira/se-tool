@@ -30,6 +30,8 @@ class FlashrankRerank(BaseDocumentCompressor):
     """Number of documents to return."""
     model: Optional[str] = None
     """Model to use for reranking."""
+    cache_dir: Optional[str] = None
+    """Directory to cache model files."""
 
     class Config:
         """Configuration for this pydantic object."""
@@ -49,7 +51,9 @@ class FlashrankRerank(BaseDocumentCompressor):
             )
 
         values["model"] = values.get("model", DEFAULT_MODEL_NAME)
-        values["client"] = values.get("client", Ranker(model_name=values["model"]))
+        values["client"] = values.get("client", 
+                                      Ranker(model_name=values["model"], cache_dir=values.get("cache_dir", None))
+                                      )
         return values
 
     def compress_documents(
@@ -58,6 +62,9 @@ class FlashrankRerank(BaseDocumentCompressor):
         query: str,
         callbacks: Optional[Callbacks] = None,
     ) -> Sequence[Document]:
+        
+        if len(documents) == 0:
+            return documents
         
         passages = [
             {
