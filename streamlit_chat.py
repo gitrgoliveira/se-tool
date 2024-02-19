@@ -52,7 +52,9 @@ def hashi_assistant():
                 memory.save_context(inputs, {"answer": result["answer"]})
                 st.session_state['assistant_result'] = result
             except Exception as ex:
+                import traceback
                 st.error(f"{ex}")
+                st.error(traceback.format_exc()) 
                 st.error(f"LLM Model: {st.session_state.get('llm_model', None)}")
                 st.error(f"LLM: {st.session_state.get('llm', None)}")
                 st.error(f"QA: {st.session_state.get('qa', None)}")
