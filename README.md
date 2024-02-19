@@ -1,60 +1,45 @@
-# Hashi bot
+# Hashi SE Tool
 
-This repo contains the main python files that shold be run independantly.
+This is a tool that can be used by HashiCorp Solutions Engineer to help in their day to day work.
 
 ## Dependencies
 
- - Mac with M1 Pro
- - Ollama - https://ollama.ai/
+### Hardware recommended
+Mac with M1 Pro
+
+### Software dependencies
+ - Ollama - https://ollama.com/
+ - Docker
  - Github access
  - Python 3.11
 
-## Installation
-
-export TOKENIZERS_PARALLELISM=true
-
-1. Clone the repository to your local machine
-2. create a Python virtual environment:
-```bash
-$ python -m venv .venv
-$ source .venv/bin/activate
-```
-
-3. Install the required dependencies using pip:
-```bash
-$ pip install -r requirements.txt
-```
-
-4. Pull the required model files with ollama (can be changed in `hashi_chat.py` from line 44 onwards):
-```bash
-$ ollama pull mistral:7b-instruct-v0.2-q4_0
-```
-* Feel free to change the model used in `hashi_chat.py` line 48
-
-5. Set some environment variables:
-```bash
-export TOKENIZERS_PARALLELISM=true
-```
-
 ## Usage
 
-1. create the folder with all the latest documents:
-```bash
-$ python generate_docs.py
-```
-2. run the bot:
-```bash
-$ python hashi_chat.py
-```
-3. If all runs well you should be able to run chainlit:
-```bash
-$ python -m chainlit RAG.py
-```
 
-These commands are all under `run.sh`
+1. Clone the repo
+2. create the following sub-folders:
+    * cache_docker (for docker caching)
+    * cache (to use python directly)
 
-## Creating the embeddings
+3. Go to https://ollama.com/library and download some models.
+
+### With Docker
+
+1. Have Ollama running -> see `run_ollama.sh`.
+2. set `OLLAMA_HOST` in `docker-compose.yaml` to the IP of your machine. 
+3. Run `docker compose up -d`.
+
+*Note: Once I have a docker container published, this will be easier*
+
+### Without docker
+
+1. Have Ollama running -> see `run_ollama.sh`
+2. Run from source with `run_streamlit.sh`
+
+## Creating embeddings
 
 The quality of the answers only goes as far as the quality of the LLM, prompt and embeddings.
-To tweak and create new emebeddings, use the `embed_hashicorp.py` script.
 
+For RAG, create embeddings with the `embed_hashicorp.py` script or, if you work for HashiCorp, contact me directly.
+
+See `run_embed.sh`
