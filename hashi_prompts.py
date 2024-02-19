@@ -14,8 +14,8 @@ def prompt_from_model(model_name: str) -> str:
         .replace("{{ end }}", "")\
         .replace("{{- if .System }}", "")\
         .replace("{{- end }}", "")\
-        .replace("{{ .System }}", "{system} ")\
-            .replace("{{ .Prompt }}", "{prompt} ")
+        .replace("{{ .System }}", " {system} ")\
+        .replace("{{ .Prompt }}", " {prompt} ")
         
     if model_name.startswith("starling-lm"):
         template = ollama.show(model_name)['template'].replace("{{ .System }}", "{system}").replace("{{ .Prompt}}", "{prompt} ")
