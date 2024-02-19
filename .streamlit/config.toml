@@ -1,0 +1,7 @@
+[client]
+showErrorDetails = true
+toolbarMode = "viewer"
+showSidebarNavigation = true
+
+[browser]
+gatherUsageStats = false

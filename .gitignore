@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+clean_env
+streamlit_env
+cache
+cache_docker
+env
+embed
+archive
+
+# Temp files
+.chainlit
+.vscode
+output*
+chainlit.md
+my-app
+terraform
+.DS_Store

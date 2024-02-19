@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      # labels:
+      #   - com.host.description=label
+      context: .
+      dockerfile: Dockerfile
+    image: hashi-se-tool
+    container_name: hashi-se-tool
+    volumes:
+      - ./output_ai_files:/app/output_ai_files
+      - ./cache_docker:/app/cache
+    ports:
+      - 8501:8501
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - OLLAMA_HOST=http://192.168.188.41:11434
+    command: streamlit run /app/streamlit_chat.py
+#  For Linux or Windows machines
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #       - driver: nvidia
+    #         count: all
+    #         capabilities: [gpu]
