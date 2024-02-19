@@ -27,6 +27,7 @@ from langchain_core.callbacks.streaming_stdout import (
 from langchain_core.messages import get_buffer_string
 from langchain_core.prompts import PromptTemplate
 from langchain_core.vectorstores import VectorStore
+from langchain_core.retrievers import BaseRetriever
 from tqdm import tqdm
 
 import hashi_prompts
@@ -162,7 +163,7 @@ def get_chroma_retrievers(path, embedding_function):
     return retrievers
 
 
-def get_pipeline_retriever(merger_retriever, filter_embeddings, use_filters=False):
+def get_pipeline_retriever(merger_retriever, filter_embeddings, use_filters=False) -> BaseRetriever:
     transformers = []
     reordering = LongContextReorder()
     
@@ -179,7 +180,9 @@ def get_pipeline_retriever(merger_retriever, filter_embeddings, use_filters=Fals
     reranker = FlashrankRerank(
         client=Ranker(model_name="rank-T5-flan",
         cache_dir=DEFAULT_CACHE_DIR),
-        top_n=5)
+        top_n=5, 
+        cache_dir=DEFAULT_CACHE_DIR)
+        
     transformers.append(reranker)
     
     transformers.append(reordering)
@@ -290,7 +293,7 @@ def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_s
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)
 
-def retrieval_qa_chain(llm: Ollama, retriever, memory):
+def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
     from langchain.chains.conversational_retrieval.prompts import (
         CONDENSE_QUESTION_PROMPT)
     from langchain_core.runnables import (RunnableLambda, RunnableParallel,
@@ -323,25 +326,41 @@ def retrieval_qa_chain(llm: Ollama, retriever, memory):
     }
     
     # Retrieve the relevant documents
-    retrieved_documents = {
-        "docs": itemgetter("standalone_question") | retriever,
-        "question": lambda x: x["standalone_question"],
-    }
-    
-    # Construct the inputs for the final prompt
-    final_inputs = {
-        "context": lambda x: _combine_documents(x["docs"]),
-        "question": itemgetter("question"),
-        "chat_history": lambda x: get_buffer_string(x.get("chat_history", [])),
-    }
+    if retriever == None:
+        retrieved_documents = {
+            "docs": {},
+            "question": lambda x: x["standalone_question"],
+        }
+
+        # Construct the inputs for the final prompt
+        final_inputs = {
+            "context": {},
+            "question": itemgetter("question"),
+            "chat_history": lambda x: get_buffer_string(x.get("chat_history", [])),
+        }
+        
+    else:
+        retrieved_documents = {
+            "docs": itemgetter("standalone_question") | retriever,
+            "question": lambda x: x["standalone_question"],
+        }
+        
+        # Construct the inputs for the final prompt
+        final_inputs = {
+            "context": lambda x: _combine_documents(x["docs"]),
+            "question": itemgetter("question"),
+            "chat_history": lambda x: get_buffer_string(x.get("chat_history", [])),
+        }
     
     # The part that returns the answers
+    
     answer = {
         "answer": final_inputs | hashi_prompts.QA_prompt(llm.model) | llm,
         "docs": itemgetter("docs"),
     }
     
     final_chain = loaded_memory | standalone_question | retrieved_documents | answer
+        
     
     return final_chain
 
@@ -391,7 +410,7 @@ def check_ollama_host(ollama_host: str) -> str:
     
     return url
 
-def get_retriever(llm, use_filters=False):
+def get_retriever(llm, use_filters=False) -> BaseRetriever | None:
     embedding_function = get_embedding()
     # filter_embedding = get_filter_embedding()
     chroma_retrievers = []
@@ -405,10 +424,12 @@ def get_retriever(llm, use_filters=False):
     # tfidf_retriever = get_retriever_tfidf(documents)
     # chroma_retrievers.append(tfidf_retriever)
     print("Loaded ", len(chroma_retrievers), "retrievers")
+    if len(chroma_retrievers) == 0:
+        return None
     
     merger_retriever = MergerRetriever(retrievers=chroma_retrievers)
     # retriever = get_pipeline_retriever(merger_retriever, embedding_function, use_filters=use_filters)
-
+    
     from langchain.retrievers.multi_query import MultiQueryRetriever
     logging.getLogger("langchain.retrievers.multi_query").setLevel(logging.INFO)
     retriever_from_llm = MultiQueryRetriever.from_llm(
