@@ -2,6 +2,8 @@
 
 This is a tool that can be used by HashiCorp Solutions Engineer to help in their day to day work.
 
+![SE Tool Screenshot](assets/Screenshot_se_tools.png)
+
 ## Dependencies
 
 ### Hardware recommended
