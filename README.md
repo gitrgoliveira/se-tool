@@ -1,6 +1,6 @@
-# Hashi SE Tool
+# HashiCorp SE Tool
 
-This is a tool that can be used by HashiCorp Solutions Engineer to help in their day to day work.
+This is a tool to help HashiCorp Solutions Engineers in their day to day work.
 
 ![SE Tool Screenshot](assets/Screenshot_se_tools.png)
 
@@ -16,7 +16,6 @@ Mac with M1 Pro
  - Python 3.11
 
 ## Usage
-
 
 1. Clone the repo
 2. create the following sub-folders:
