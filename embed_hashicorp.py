@@ -254,7 +254,6 @@ def recursive_website_loader(url: dict):
 
     # docs = loader.load()
     from web_scraper import Scraper
-    
     docs = Scraper(base_url=url['url'], 
                    max_depth=url['depth'], 
                    prevent_outside=url['prevent_outside'],
@@ -315,6 +314,8 @@ def web_split_and_embed(name, output_path, website_docs):
 
 
 if __name__ == "__main__":
+    import logging
+    logging.getLogger(__name__).setLevel(logging.DEBUG)
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     if check_github_token() is None:
         exit(1)

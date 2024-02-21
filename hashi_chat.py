@@ -26,8 +26,8 @@ from langchain_core.callbacks.streaming_stdout import (
     StreamingStdOutCallbackHandler)
 from langchain_core.messages import get_buffer_string
 from langchain_core.prompts import PromptTemplate
-from langchain_core.vectorstores import VectorStore
 from langchain_core.retrievers import BaseRetriever
+from langchain_core.vectorstores import VectorStore
 from tqdm import tqdm
 
 import hashi_prompts

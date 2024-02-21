@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sys
 from asyncio import Semaphore
 from multiprocessing import Manager
 from sqlite3 import connect
@@ -30,6 +31,8 @@ class Scraper(BaseLoader):
         
         self.debug = debug
         self.logger = logging.getLogger(__name__)
+        handler = logging.StreamHandler(sys.stdout)
+        self.logger.addHandler(handler)
         if self.debug:
             self.logger.setLevel(logging.DEBUG)
         else:

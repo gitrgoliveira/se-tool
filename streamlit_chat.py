@@ -1,5 +1,5 @@
-from typing import List
 import os
+from typing import List
 
 import ollama
 import streamlit as st
@@ -11,7 +11,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 import hashi_prompts
-from hashi_chat import ModelDownloader, get_hashi_chat, load_llm, check_ollama_host
+from hashi_chat import (ModelDownloader, check_ollama_host, get_hashi_chat,
+                        load_llm)
 from streamlit_playground import add_playground
 from streamlit_shared import StreamHandler, display_result
 

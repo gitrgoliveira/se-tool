@@ -10,6 +10,6 @@ else
 fi
 source env/bin/activate
 pip install --upgrade pip
-# export GITHUB_PERSONAL_ACCESS_TOKEN=
 pip install -r requirements.streamlit.txt
+playwright install
 python embed_hashicorp.py
