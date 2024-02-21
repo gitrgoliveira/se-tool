@@ -1,4 +1,4 @@
-# HashiCorp SE Tool
+# Solutions Engineer Companion Tool
 
 This is a tool to help HashiCorp Solutions Engineers in their day to day work.
 

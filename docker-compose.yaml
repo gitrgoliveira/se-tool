@@ -7,8 +7,8 @@ services:
       #   - com.host.description=label
       context: .
       dockerfile: Dockerfile
-    image: hashi-se-tool
-    container_name: hashi-se-tool
+    image: se-tool
+    container_name: se-tool
     volumes:
       - ./output_ai_files:/app/output_ai_files
       - ./cache_docker:/app/cache
