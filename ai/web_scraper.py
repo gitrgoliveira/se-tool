@@ -9,7 +9,6 @@ from urllib.parse import urldefrag, urlparse
 
 from bs4 import BeautifulSoup
 from langchain.document_loaders.base import BaseLoader
-# from langchain.schema.document import Document
 from langchain.text_splitter import TextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents.base import Document

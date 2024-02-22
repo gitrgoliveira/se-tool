@@ -14,6 +14,9 @@
     # Add the current directory contents into the container at /app
     ADD .streamlit/ /app/.streamlit
     ADD *.py /app
+    ADD ai/*.py /app/ai/
+    ADD ui/*.py /app/ui/
+
     RUN chown -R streamlit:streamlit /app
 
 

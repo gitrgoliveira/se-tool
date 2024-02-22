@@ -12,4 +12,6 @@ source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.streamlit.txt
 playwright install
-python embed_hashicorp.py
+
+# export GITHUB_PERSONAL_ACCESS_TOKEN=
+python create_embeddings.py

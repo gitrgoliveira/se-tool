@@ -11,7 +11,6 @@ from langchain.memory import ConversationSummaryMemory
 from langchain.tools import Tool
 from langchain.utils.openai_functions import (
     convert_pydantic_to_openai_function)
-from langchain_community.tools import RequestsGetTool, SearxSearchResults
 from langchain_community.tools.convert_to_openai import (
     format_tool_to_openai_function)
 from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchResults
@@ -25,11 +24,10 @@ from langchain_community.utils.ernie_functions import (
     convert_pydantic_to_ernie_function)
 from langchain_core.runnables import (RunnableLambda, RunnableParallel,
                                       RunnablePassthrough)
-from langchain_experimental.tools import PythonREPLTool
 from pydantic import BaseModel, Field
 
-import hashi_prompts
-from hashi_chat import get_retriever
+import ai.hashi_prompts as hashi_prompts
+from ai.hashi_chat import get_retriever
 
 
 def get_hashi_agent(callback_manager=None):
@@ -61,16 +59,9 @@ def get_hashi_agent(callback_manager=None):
     from langchain_community.tools.playwright.current_page import (
         CurrentWebPageTool)
     
-    tools.append(RequestsGetTool(
-        name='requests_get',
-        description='A portal to the internet. Use this to get specific content from a website or to check if a given url/reference has the expected content. Input should be a url (i.e. https://www.google.com). The output will be the text response of the GET request.',
-       requests_wrapper=TextRequestsWrapper())
-    )
-    
     async_browser = create_async_playwright_browser()
     playwright_toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=async_browser)
     tools.extend(playwright_toolkit.get_tools())
-    # tools.append(PythonREPLTool())
         
     # prompt = hub.pull("hwchase17/react")
     # prompt = hub.pull("langchain-ai/react-agent-template")

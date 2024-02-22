@@ -1,3 +1,5 @@
+import logging
+
 import ollama
 from langchain_core.prompts import PromptTemplate
 
@@ -14,12 +16,14 @@ def prompt_from_model(model_name: str) -> str:
         .replace("{{ end }}", "")\
         .replace("{{- if .System }}", "")\
         .replace("{{- end }}", "")\
+        .replace("{{ .Response }}<end_of_turn>", "")\
         .replace("{{ .System }}", " {system} ")\
         .replace("{{ .Prompt }}", " {prompt} ")
         
     if model_name.startswith("starling-lm"):
         template = ollama.show(model_name)['template'].replace("{{ .System }}", "{system}").replace("{{ .Prompt}}", "{prompt} ")
 
+    logging.debug(f"Base template used: {template}")
     return template
 
 

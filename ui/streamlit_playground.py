@@ -1,12 +1,12 @@
 
+import ai.hashi_prompts as hashi_prompts
 import streamlit as st
 from langchain.schema.runnable.config import RunnableConfig
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-import hashi_prompts
-from streamlit_shared import StreamHandler, display_result
+from ui.streamlit_shared import StreamHandler, display_result
 
 
 def add_playground():

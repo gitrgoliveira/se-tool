@@ -30,9 +30,9 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.vectorstores import VectorStore
 from tqdm import tqdm
 
-import hashi_prompts
-from embed_hashicorp import get_embedding, output_ai, repo_name
-from RAG_sources import repos_and_folders, website_urls
+import ai.hashi_prompts as hashi_prompts
+from ai.embed_hashicorp import get_embedding, output_ai, repo_name
+from ai.RAG_sources import repos_and_folders, website_urls
 
 CPU_THREADS = 16
 GPU_THREADS = 32
@@ -66,11 +66,11 @@ class ModelDownloader:
     def download_model(cls, llm_model: str) -> bool:
         with cls.download_lock:            
             if not cls.model_exists(llm_model):
-                print("Downloading model", llm_model)
+                logging.info("Downloading model", llm_model)
                 progress_response = cls.cli.pull(model=llm_model, stream=True)
     
                 if isinstance(progress_response, ollama.RequestError):
-                    print("Failed to download file:", progress_response)
+                    logging.error("Failed to download file:", progress_response)
                     return False
                     
                 # Initialize the progress bar
@@ -91,7 +91,7 @@ class ModelDownloader:
                     pbar.close()
 
             else:
-                print("Model already downloaded", llm_model)
+                logging.warning("Model already downloaded", llm_model)
         return True
 
     @classmethod
@@ -149,14 +149,14 @@ def get_chroma_retrievers(path, embedding_function):
         name = repo_name(repo_info["repo_url"])
         repo_path = os.path.join(path, "git", name)
         if os.path.exists(repo_path):
-            print("Loading git embeddings for", name)
+            logging.debug("Loading git embeddings for", name)
             vectorstore = get_vectorstore_chroma(repo_path, embedding_function)
             retrievers.append(get_retriever_chroma(vectorstore))
 
     for url in website_urls:
         repo_path = os.path.join(path, "web", url['name'])
         if os.path.exists(repo_path):
-            print("Loading web embeddings for", url)
+            logging.debug("Loading web embeddings for", url)
             vectorstore = get_vectorstore_chroma(repo_path, embedding_function)
             retrievers.append(get_retriever_chroma(vectorstore))
             
@@ -244,7 +244,7 @@ def load_llm(llm_model: str = default_llm_model, host: str = "", callback_manage
         ollama_host = os.getenv('OLLAMA_HOST', "http://localhost:11434")
 
     ollama_host = check_ollama_host(ollama_host)
-    print("Loaded Ollama from", ollama_host)
+    logging.info("Loaded Ollama from", ollama_host)
     ModelDownloader(host=ollama_host).download_model(llm_model)
     return Ollama(
         base_url=ollama_host,
@@ -366,7 +366,7 @@ def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
 
 def get_hashi_search(llm=None, callback_manager=None):
     if llm == None:
-        print("Loading a new LLM")
+        logging.debug("Loading a new LLM")
         loaded_llm = load_llm(callback_manager=callback_manager)
     else:
         loaded_llm=llm
@@ -383,10 +383,10 @@ def get_hashi_search(llm=None, callback_manager=None):
 
 def get_hashi_chat(llm=None, callback_manager=None):
     if llm == None:
-        print("Loading a new LLM")
+        logging.debug("Loading a new LLM")
         loaded_llm = load_llm(callback_manager=callback_manager)
     else:
-        print("Using the provided LLM")
+        logging.debug("Using the provided LLM")
         loaded_llm=llm
         
     memory = ConversationSummaryMemory(
@@ -423,7 +423,7 @@ def get_retriever(llm, use_filters=False) -> BaseRetriever | None:
     # chroma_retrievers.append(bm25_retriever)
     # tfidf_retriever = get_retriever_tfidf(documents)
     # chroma_retrievers.append(tfidf_retriever)
-    print("Loaded ", len(chroma_retrievers), "retrievers")
+    logging.info("Loaded ", len(chroma_retrievers), "retrievers")
     if len(chroma_retrievers) == 0:
         return None
     

@@ -19,7 +19,7 @@ from langchain_community.embeddings import (  # HuggingFaceEmbeddings,
     HuggingFaceBgeEmbeddings, HuggingFaceInstructEmbeddings)
 from langchain_community.vectorstores.chroma import Chroma
 
-from RAG_sources import repos_and_folders, website_urls
+from ai.RAG_sources import repos_and_folders, website_urls
 
 CPU_THREADS = 16
 GPU_THREADS = 32
@@ -253,7 +253,7 @@ def recursive_website_loader(url: dict):
     #     )
 
     # docs = loader.load()
-    from web_scraper import Scraper
+    from ai.web_scraper import Scraper
     docs = Scraper(base_url=url['url'], 
                    max_depth=url['depth'], 
                    prevent_outside=url['prevent_outside'],
@@ -312,24 +312,6 @@ def web_split_and_embed(name, output_path, website_docs):
     os.makedirs(output_path, exist_ok=True)
     create_embeddings(name, website_docs, output_path)
 
-
-if __name__ == "__main__":
-    import logging
-    logging.getLogger(__name__).setLevel(logging.DEBUG)
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    if check_github_token() is None:
-        exit(1)
-    base_path = os.path.join(output_ai, "web")    
-    create_website_embeddings(base_path)
-    
-    base_path = os.path.join(output_ai, "git")    
-    create_git_embeddings(base_path)
-    
-    # Shutdown the processor
+def wait_until_finished():
     load_processor.shutdown()
     embedding_processor.shutdown()
-    print ("Done")
-        
-    
-
-    

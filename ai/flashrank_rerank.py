@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
 from langchain.callbacks.manager import Callbacks
@@ -65,6 +66,7 @@ class FlashrankRerank(BaseDocumentCompressor):
     ) -> Sequence[Document]:
         
         if len(documents) == 0:
+            logging.debug("FlashRank: No documents to rerank")
             return documents
         
         passages = [
