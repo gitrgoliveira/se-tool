@@ -6,8 +6,8 @@ __pycache__/
 # Environments
 clean_env
 streamlit_env
-cache
-cache_docker
+cache/*
+cache_docker/*
 env
 embed
 archive
