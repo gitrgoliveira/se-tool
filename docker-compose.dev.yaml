@@ -2,9 +2,6 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: ghcr.io/gitrgoliveira/se-tool/sect:latest
     container_name: sect
     volumes:

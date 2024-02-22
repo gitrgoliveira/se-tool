@@ -1,6 +1,4 @@
 ## HashiCorp Personal Assistant TODO
-#### V0
-1. Publish as a docker container
 #### V1
 1. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. 
 #### V3
