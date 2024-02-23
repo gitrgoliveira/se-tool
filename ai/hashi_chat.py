@@ -180,7 +180,7 @@ def get_pipeline_retriever(merger_retriever, filter_embeddings, use_filters=Fals
     
     from flashrank import Ranker
 
-    from flashrank_rerank import FlashrankRerank
+    from ai.flashrank_rerank import FlashrankRerank
     reranker = FlashrankRerank(
         client=Ranker(model_name="rank-T5-flan",
         cache_dir=DEFAULT_CACHE_DIR),
