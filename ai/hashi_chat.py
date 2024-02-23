@@ -4,7 +4,7 @@ import logging
 import os
 import threading
 from operator import itemgetter
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional, Mapping
 from urllib.parse import urlparse
 
 import ollama
@@ -63,9 +63,9 @@ class ModelDownloader:
         return cls._instance
 
     @classmethod
-    def download_model(cls, llm_model: str) -> bool:
+    def download_model(cls, llm_model: str, force: bool = False) -> bool:
         with cls.download_lock:            
-            if not cls.model_exists(llm_model):
+            if (not cls.model_exists(llm_model)) or force:
                 logging.info("Downloading model", llm_model)
                 progress_response = cls.cli.pull(model=llm_model, stream=True)
     
@@ -98,6 +98,10 @@ class ModelDownloader:
     def model_exists(cls, llm_model: str) -> bool:
         models = cls.cli.list()
         return any(model['name'] == llm_model for model in models['models'])
+    
+    @classmethod
+    def list(cls) -> Mapping[str, Any]:
+        return cls.cli.list() 
             
 def get_retriever_tfidf(documents):
     from langchain.retrievers import TFIDFRetriever
