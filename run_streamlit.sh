@@ -7,6 +7,7 @@ else
 fi
 source env/bin/activate
 
+export OLLAMA_HOST=http://127.0.0.1:11434
 # export GITHUB_PERSONAL_ACCESS_TOKEN=
 pip install --upgrade pip
 pip install -r requirements.streamlit.txt
