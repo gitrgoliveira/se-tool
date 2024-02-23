@@ -43,9 +43,13 @@ def hashi_writer ():
             if prompt_selected [0] == "0":
                 prompt_selected = ("Use Markdown format in your answer. Summarise the input meeting notes in the following format \n",
                                    "### Agenda: \n",
+                                   "High-level topics that were discussed\n",
                                    "### Attendees: \n",
+                                   "List of names mentioned in the notes \n",
                                    "### Notes: \n",
-                                   "### Action points from notes: \n",
+                                   "A rephrasing and cleanup of the notes \n",
+                                   "### Action points: \n",
+                                   "Any actions points implied in the notes\n",
                                    )
 
             elif prompt_selected[0] =="1":

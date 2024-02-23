@@ -66,11 +66,11 @@ class ModelDownloader:
     def download_model(cls, llm_model: str, force: bool = False) -> bool:
         with cls.download_lock:            
             if (not cls.model_exists(llm_model)) or force:
-                logging.info("Downloading model", llm_model)
+                logging.info(f"Downloading model {llm_model}")
                 progress_response = cls.cli.pull(model=llm_model, stream=True)
     
                 if isinstance(progress_response, ollama.RequestError):
-                    logging.error("Failed to download file:", progress_response)
+                    logging.error(f"Failed to download file: {progress_response}")
                     return False
                     
                 # Initialize the progress bar
@@ -91,7 +91,7 @@ class ModelDownloader:
                     pbar.close()
 
             else:
-                logging.warning("Model already downloaded", llm_model)
+                logging.warning(f"Model already downloaded {llm_model}")
         return True
 
     @classmethod
@@ -153,14 +153,14 @@ def get_chroma_retrievers(path, embedding_function):
         name = repo_name(repo_info["repo_url"])
         repo_path = os.path.join(path, "git", name)
         if os.path.exists(repo_path):
-            logging.debug("Loading git embeddings for", name)
+            logging.debug(f"Loading git embeddings for {name}")
             vectorstore = get_vectorstore_chroma(repo_path, embedding_function)
             retrievers.append(get_retriever_chroma(vectorstore))
 
     for url in website_urls:
         repo_path = os.path.join(path, "web", url['name'])
         if os.path.exists(repo_path):
-            logging.debug("Loading web embeddings for", url)
+            logging.debug(f"Loading web embeddings for {url}")
             vectorstore = get_vectorstore_chroma(repo_path, embedding_function)
             retrievers.append(get_retriever_chroma(vectorstore))
             
@@ -248,7 +248,7 @@ def load_llm(llm_model: str = default_llm_model, host: str = "", callback_manage
         ollama_host = os.getenv('OLLAMA_HOST', "http://localhost:11434")
 
     ollama_host = check_ollama_host(ollama_host)
-    logging.info("Loaded Ollama from", ollama_host)
+    logging.info(f"Loaded Ollama from {ollama_host}")
     ModelDownloader(host=ollama_host).download_model(llm_model)
     return Ollama(
         base_url=ollama_host,
@@ -427,7 +427,7 @@ def get_retriever(llm, use_filters=False) -> BaseRetriever | None:
     # chroma_retrievers.append(bm25_retriever)
     # tfidf_retriever = get_retriever_tfidf(documents)
     # chroma_retrievers.append(tfidf_retriever)
-    logging.info("Loaded ", len(chroma_retrievers), "retrievers")
+    logging.info(f"Loaded {len(chroma_retrievers)} retrievers")
     if len(chroma_retrievers) == 0:
         return None
     
