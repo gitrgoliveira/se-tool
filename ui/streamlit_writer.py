@@ -41,15 +41,15 @@ def hashi_writer ():
         prompt_selected = st.selectbox("Select the action", options=prompt_options)
         if prompt_selected != None:
             if prompt_selected [0] == "0":
-                prompt_selected = ("Use Markdown format in your answer. Summarise the input meeting notes in the following format \n",
+                prompt_selected = ("Use Markdown in your answer. Use the following format for the input meeting notes \n",
                                    "### Agenda: \n",
-                                   "High-level topics that were discussed\n",
+                                   "High-level main topics that were discussed in the meeting notes. Only 5 at most.\n",
                                    "### Attendees: \n",
-                                   "List of names mentioned in the notes \n",
+                                   "Names of people mentioned in the meeting notes \n",
                                    "### Notes: \n",
-                                   "A rephrasing and cleanup of the notes \n",
+                                   "Rephrase and cleanup the meeting notes \n",
                                    "### Action points: \n",
-                                   "Any actions points implied in the notes\n",
+                                   "Any actions points implied in the meeting notes\n",
                                    )
 
             elif prompt_selected[0] =="1":
