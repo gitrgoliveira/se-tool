@@ -6,9 +6,9 @@ import streamlit as st
 
 from ai.hashi_chat import (ModelDownloader, check_ollama_host, get_hashi_chat,
                            load_llm)
+from ui.streamlit_assistant import hashi_assistant
 from ui.streamlit_playground import add_playground
 from ui.streamlit_writer import hashi_writer
-from ui.streamlit_assistant import hashi_assistant
 
 
 def get_model_list(ollama_host: str | None) -> List[str]:
