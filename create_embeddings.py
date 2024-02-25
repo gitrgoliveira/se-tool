@@ -1,12 +1,14 @@
 import logging
 import os
+import sys
 
 from ai.embed_hashicorp import (check_github_token, create_git_embeddings,
                                 create_website_embeddings, output_ai,
                                 wait_until_finished)
 
 if __name__ == "__main__":
-    logging.getLogger(__name__).setLevel(logging.DEBUG)
+    # logging.getLogger().setLevel(logging.DEBUG)
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     if check_github_token() is None:
