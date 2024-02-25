@@ -3,7 +3,6 @@ import logging
 import sys
 from asyncio import Semaphore
 from multiprocessing import Manager
-from sqlite3 import connect
 from typing import List, Optional
 from urllib.parse import urldefrag, urlparse
 
@@ -30,8 +29,6 @@ class Scraper(BaseLoader):
         
         self.debug = debug
         self.logger = logging.getLogger(__name__)
-        handler = logging.StreamHandler(sys.stdout)
-        self.logger.addHandler(handler)
         if self.debug:
             self.logger.setLevel(logging.DEBUG)
         else:
@@ -99,7 +96,7 @@ class Scraper(BaseLoader):
                     # now we can declare that we have properly visited the url
                     self.visited[url] = True
                     if content == None or content=="":
-                        self.logger.error("page content returned empty", content)
+                        self.logger.error(f"page content returned empty {content}")
                         if not page.is_closed():
                             await page.close()
                         break
@@ -110,7 +107,7 @@ class Scraper(BaseLoader):
                             metadata=await self._metadata_extractor(page, soup, url),
                         )
                         if text_splitter != None:
-                            self.logger.debug("Splitting documents from", url)
+                            self.logger.debug(f"Splitting documents from {url}")
                             split_documents = text_splitter.split_documents([document])
                             documents.extend(split_documents)
                         else:

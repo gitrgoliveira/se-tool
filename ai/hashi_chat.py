@@ -4,7 +4,7 @@ import logging
 import os
 import threading
 from operator import itemgetter
-from typing import Any, ClassVar, Dict, List, Optional, Mapping
+from typing import Any, ClassVar, Dict, List, Mapping, Optional
 from urllib.parse import urlparse
 
 import ollama
