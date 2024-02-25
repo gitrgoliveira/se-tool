@@ -45,8 +45,8 @@ DEFAULT_CACHE_DIR = "./cache"
 # llm_model = "mixtral:8x7b-instruct-v0.1-q3_K_L"
 # llm_model = "notux:8x7b-v1-q3_K_S"
 # llm_model = "starling-lm:7b"
-default_llm_model = "mistral:7b-instruct-v0.2-q4_0"
 # llm_model = "solar:10.7b-instruct-v1-q6_K"
+default_llm_model = "mistral:7b-instruct-v0.2-q4_0"
 
 class ModelDownloader:
     _instance = None

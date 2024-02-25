@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import sys
 from asyncio import Semaphore
 from multiprocessing import Manager
 from typing import List, Optional
