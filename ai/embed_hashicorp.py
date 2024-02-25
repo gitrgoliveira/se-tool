@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
+import datetime
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from logging import warning
+from logging import debug, error, info, warning
 
 import torch
+from dateutil.relativedelta import relativedelta
 # from bs4 import BeautifulSoup
 # from langchain.document_loaders.recursive_url_loader import RecursiveUrlLoader
 from langchain.indexes import SQLRecordManager, index
@@ -56,12 +58,12 @@ class JobProcessor:
     def shutdown(self):
         self.executor.shutdown(wait=True)
 
-load_processor = JobProcessor(max_workers=2, thread_prefix="loader")
-embedding_processor = JobProcessor(max_workers=1, thread_prefix="embedder")
+load_processor = JobProcessor(max_workers=3, thread_prefix="loader")
+embedding_processor = JobProcessor(max_workers=2, thread_prefix="embedder")
 
 
 def load_documents_md(data_path):
-    print("Loading data from {data_path}...".format(data_path=data_path)) 
+    info(f"Loading data from {data_path}...") 
     loader = DirectoryLoader(data_path, glob="**/*", recursive=True, show_progress=True, 
                              use_multithreading=True, 
                              max_concurrency=CPU_THREADS,
@@ -70,19 +72,19 @@ def load_documents_md(data_path):
     
 
     chunks = loader.load()
-    print("Loaded", len(chunks), "documents")
+    info(f"Loaded {len(chunks)} documents")
     
     return splitter_md (chunks)
 
 def splitter_md (chunks):
     md_splitter = MarkdownTextSplitter(keep_separator=True, add_start_index=True)
     html2text = Html2TextTransformer(ignore_images=False, ignore_links=False)
-    print("Splitting...")
+    info("Splitting...")
     chunks = md_splitter.split_documents(chunks)
-    print("Split into", len(chunks), "chunks, using Markdown Splitter")
+    info(f"Split into {len(chunks)} chunks, using Markdown Splitter")
     
     chunks = html2text.transform_documents(chunks)
-    print("Converted HTML to Text on", len(chunks), "chunks")
+    info(f"Converted HTML to Text on {len(chunks)} chunks")
     
     return split_text(chunks)
 
@@ -93,7 +95,7 @@ def split_text(chunks):
     #     chunk_overlap=512,
     #     length_function=len,
     # )
-    print ("Splitting text into chunks of", tokens_per_chunk, "tokens")
+    info(f"Splitting text into chunks of {tokens_per_chunk} tokens")
     nltk_splitter = NLTKTextSplitter(add_start_index=True)
     stt_splitter = SentenceTransformersTokenTextSplitter(
         model_name = model_name, 
@@ -104,21 +106,21 @@ def split_text(chunks):
         keep_separator = True
         )
     
-    print("Filtering...")
+    debug("Filtering...")
     # chunks = text_splitter.split_documents(chunks)
     chunks = filter_complex_metadata(chunks)
-    print("Filtered into", len(chunks), "chunks")
+    info(f"Filtered into {len(chunks)} chunks")
     
     chunks = nltk_splitter.split_documents(chunks)
-    print("Split into", len(chunks), "chunks, using NLTK Splitter")
+    info(f"Split into {len(chunks)} chunks, using NLTK Splitter")
     
     chunks = stt_splitter.split_documents(chunks)
-    print("Split into", len(chunks), "chunks, using Sentence Transformers Token Text Splitter")
+    info(f"Split into {len(chunks)} chunks, using Sentence Transformers Token Text Splitter")
      
     return chunks
     
 def load_documents_git(repo_path, repo_url=None):
-    print("Loading data from {repo_path}...".format(repo_path=repo_path))
+    info(f"Loading data from {repo_path}...")
 
     from langchain_community.document_loaders import (GitHubIssuesLoader,
                                                       GitLoader)
@@ -129,22 +131,26 @@ def load_documents_git(repo_path, repo_url=None):
     #         file_filter=lambda file_path: file_path.endswith(".mdx") or file_path.endswith(".mdx"),
     #         )
     # chunks = git_loader.load()
-    # print("Loaded", len(chunks), "documents")
+    # info(f"Loaded {len(chunks)} documents")
     # chunks = splitter_md (chunks)
     chunks = []
     
-    # load only issues from the past year    
-    github_loader = GitHubIssuesLoader(access_token=os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", ""), repo=repo_owner_and_name(repo_url),
-                                       since="2020-01-01T00:00:00Z")
+    # load only issues from the 3 years
+    three_years_ago = datetime.datetime.now() - relativedelta(years=3)
+    since = three_years_ago.isoformat(timespec="seconds")+'Z'
+    
+    github_loader = GitHubIssuesLoader(access_token=os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", ""),
+                                       repo=repo_owner_and_name(repo_url),
+                                       since=since)
     
     try:
         more_chunks = github_loader.load()
-        print("Loaded", len(more_chunks), "issues")
+        info(f"Loaded {len(more_chunks)} issues")
         more_chunks = splitter_md (more_chunks)
         chunks.extend(more_chunks)
         
     except Exception as e:
-        print("Error loading issues", e)
+        error(f"Error loading issues {e}")
         
     return chunks
 
@@ -188,8 +194,8 @@ def get_embedding_mistral():
     )
 
 def create_embeddings(name, documents, output_path):
-    print("Creating", name, "embeddings for", len(documents), "documents")
-    print("Output path", output_path)
+    info(f"Creating {name} embeddings for {len(documents)} documents")
+    info(f"Output path {output_path}")
     hf_bge_embeddings = get_embedding()
     record_manager = SQLRecordManager(
         name, db_url=f"sqlite:///{output_path}/record_manager_cache.sqlite"
@@ -204,17 +210,17 @@ def create_embeddings(name, documents, output_path):
     # _clear()
     result = index(documents, record_manager, vectorstore, cleanup="full", source_id_key="source")
     
-    print("Results : ", result)
+    info(f"Results: {result}")
 
     # vectorstore = Chroma.from_documents(documents=documents,
     #                                     embedding=hf_bge_embeddings,
     #                                     persist_directory=output_path)
     # vectorstore.persist()
 
-    # print("Created embeddings for", len(documents), "documents")
+    # info(f"Created embeddings for {len(documents)} documents")
     
 def add_repo_metadata(docs, repo_url):
-    print("Adding repo metadata to", len(docs), "documents")
+    info(f"Adding repo metadata to {len(docs)} documents")
     for d in docs:
         if 'source' in d.metadata:
             d.metadata['source'] = str(repo_url).split(".git")[0] +"/blob/main/"+d.metadata['source']
@@ -231,7 +237,8 @@ def add_repo_metadata(docs, repo_url):
 # https://docs.embedchain.ai/components/data-sources/docs-site
 
 def recursive_website_loader(url: dict):
-    print("Loading data from {url} ".format(url=url))
+    print(f"Loading data from {url}")
+    info(f"Loading data from {url}")
 
     html2text = Html2TextTransformer(ignore_images=False, ignore_links=False)
     
@@ -261,13 +268,13 @@ def recursive_website_loader(url: dict):
                    ).load_and_split(NLTKTextSplitter())
     docs = html2text.transform_documents(docs)
     
-    print("Loaded", len(docs), "documents from {url} ".format(url=url))    
+    info(f"Loaded {len(docs)} documents from {url}")    
     return docs
 
 def check_github_token():
     token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
     if token is None:
-        warning("GITHUB_PERSONAL_ACCESS_TOKEN not set.")
+        error("GITHUB_PERSONAL_ACCESS_TOKEN not set.")
     return token
 
 def create_git_embeddings(base_path):
@@ -286,14 +293,14 @@ def create_git_embeddings(base_path):
     for repo_url, output_path, future in jobs:
         name = repo_name(repo_url)
         github_docs = future.result()
-        print("Loaded", len(github_docs), "documents from", name)
+        info(f"Loaded {len(github_docs)} documents from {name}")
         docs = add_repo_metadata(github_docs, repo_url)
         os.makedirs(output_path, exist_ok=True)
         embedding_processor.submit_job(create_embeddings, name, docs, output_path)
     
 
 
-def create_website_embeddings(base_path):    
+def create_website_embeddings(base_path):
     jobs = []
     for website_url in website_urls:
         output_path = os.path.join(base_path, website_url['name'])
@@ -303,7 +310,7 @@ def create_website_embeddings(base_path):
     # Process the jobs and collect the results
     for name, output_path, future in jobs:
         website_docs = future.result()
-        print("Loaded", len(website_docs), "documents from", name)
+        info(f"Loaded {len(website_docs)} documents from {name}")
         embedding_processor.submit_job(web_split_and_embed, name, output_path, website_docs)
         
 
