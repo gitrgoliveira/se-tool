@@ -4,9 +4,11 @@ from typing import List
 import ollama
 import streamlit as st
 
-from ai.hashi_chat import (ModelDownloader, check_ollama_host, get_hashi_chat,
-                           load_llm)
+from ai.common import ModelDownloader, check_ollama_host, load_llm
+from ai.hashi_chat import get_hashi_chat
+from ai.hashi_search import get_hashi_search
 from ui.streamlit_assistant import hashi_assistant
+from ui.streamlit_chat import hashi_chat
 from ui.streamlit_playground import add_playground
 from ui.streamlit_writer import hashi_writer
 
@@ -32,13 +34,15 @@ def main():
     with st.sidebar:
         settings()
     
-    writer, search, assistant, playground = st.tabs(["Write", "Search", "Research", "AI Playground"])    
+    writer, chat, search, assistant, playground = st.tabs(["Write", "Chat", "Search", "Research", "AI Playground"])    
     with search:
         hashi_assistant()
     with assistant:
         st.write("Coming soon!")
     with writer:
         hashi_writer()
+    with chat:
+        hashi_chat()
     with playground:
         add_playground()
 
@@ -81,6 +85,10 @@ def settings():
         with st.spinner("Loading language model..."):
             if 'qa' in st.session_state:
                 del st.session_state['qa']
+            if 'search' in st.session_state:
+                del st.session_state['search']
+            if 'chat' in st.session_state:
+                del st.session_state['chat']
             if 'llm' in st.session_state:
                 del st.session_state['llm']
                     
@@ -89,6 +97,8 @@ def settings():
                                                    host=ollama_host,
                                                    temperature=temperature)
             st.session_state['qa'] = get_hashi_chat(llm=st.session_state['llm'] )
+            st.session_state['search'] = get_hashi_search(llm=st.session_state['llm'] )
+            st.session_state['chat'] = get_hashi_chat(llm=st.session_state['llm'] )
             st.toast(f"Loaded {st.session_state.get('llm_model')} with {temperature}")
 
     if st.session_state.get('llm', None) == None:

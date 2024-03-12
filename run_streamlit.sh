@@ -12,4 +12,5 @@ export OLLAMA_HOST=http://127.0.0.1:11434
 pip install --upgrade pip
 pip install -r requirements.streamlit.txt
 ollama pull mistral:7b
-python -m streamlit run streamlit_chat.py
+ulimit -n 10240
+python -m streamlit run main.py
