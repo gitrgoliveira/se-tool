@@ -20,3 +20,4 @@ chainlit.md
 my-app
 terraform
 .DS_Store
+*.zip
