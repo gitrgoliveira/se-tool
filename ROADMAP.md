@@ -1,6 +1,7 @@
 ## HashiCorp Personal Assistant TODO
 #### V1
-1. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. 
+1. Use embeddings from common crawler
+2. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. 
 #### V3
 1. Work on Image recognition/extraction
 #### V4
