@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from ai.hashi_chat import ModelDownloader
+from ai.common import ModelDownloader
 
 downloader = ModelDownloader("")
 model_list = downloader.list()

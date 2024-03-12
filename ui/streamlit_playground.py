@@ -10,6 +10,10 @@ from ui.streamlit_shared import StreamHandler, display_result
 
 
 def add_playground():
+    # st.header("Prompt playground")
+    st.markdown(("Here are some links that may help you design prompts: \n" +
+             " * https://www.promptingguide.ai/ \n" +
+             " * https://prompt-helper.com/ \n"))
     TEXT_AREA_HEIGHT = 250
     system = st.text_area(label="System", height=TEXT_AREA_HEIGHT, key="pg_system",
                         placeholder="System instruction", label_visibility="collapsed")

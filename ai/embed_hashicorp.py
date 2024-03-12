@@ -222,10 +222,13 @@ def create_embeddings(name, documents, output_path):
 def add_repo_metadata(docs, repo_url):
     info(f"Adding repo metadata to {len(docs)} documents")
     for d in docs:
-        if 'source' in d.metadata:
+        if 'url' in d.metadata:
+            d.metadata['source'] = d.metadata['url']
+        elif 'source' in d.metadata:
             d.metadata['source'] = str(repo_url).split(".git")[0] +"/blob/main/"+d.metadata['source']
         else:
             d.metadata['source'] = repo_url
+            
     return docs
 
 # from langchain_community.retrievers.embedchain import EmbedchainRetriever

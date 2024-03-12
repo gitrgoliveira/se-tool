@@ -6,14 +6,14 @@ from ui.streamlit_shared import StreamHandler, display_result
 
 
 def hashi_assistant():
-    st.header("Your personal HashiCorp Assistant")
+    st.header("Your personal assistant")
     
     # with st.spinner("Loading language model..."):
-    if 'qa' not in st.session_state:
+    if 'search' not in st.session_state:
         st.warning("Please load an LLM first")
         return
         
-    qa, memory = st.session_state['qa']
+    search = st.session_state['search']
 
     # Add a text input for the search query
     query = st.text_area("Enter your search query:", height=200)
@@ -28,13 +28,11 @@ def hashi_assistant():
         with st.spinner("Searching..."):
             try:
                 st.session_state["search_button_disabled"] = True
-                # try: 
                 ctx = get_script_run_ctx(suppress_warning=True)
                 chat_box = st.empty()
                 stream_handler = StreamHandler(chat_box, display_method='write', ctx=ctx)    
                 inputs = {"question": str(query).strip()}
-                result = qa.invoke(inputs, config=RunnableConfig(callbacks=[stream_handler]))
-                memory.save_context(inputs, {"answer": result["answer"]})
+                result = search.invoke(inputs, config=RunnableConfig(callbacks=[stream_handler]))
                 st.session_state['assistant_result'] = result
             except Exception as ex:
                 import traceback
@@ -42,7 +40,7 @@ def hashi_assistant():
                 st.error(traceback.format_exc()) 
                 st.error(f"LLM Model: {st.session_state.get('llm_model', None)}")
                 st.error(f"LLM: {st.session_state.get('llm', None)}")
-                st.error(f"QA: {st.session_state.get('qa', None)}")
+                st.error(f"Search: {st.session_state.get('search', None)}")
             finally:
                 st.session_state["search_button_disabled"] = False
     
@@ -50,20 +48,26 @@ def hashi_assistant():
         result = st.session_state['assistant_result']
         st.success("Search results found!")
         try:
-            display_result(result["answer"], st.container(border=True))
-            # st.markdown(result["answer"])
-            # chat_box.empty()
+            container = st.container(border=True)
+            display_result(result["answer"], container=container)
+        
+            if "docs" in result and \
+                len(result["docs"]) > 0:
+                container.write(f"### Source documents")
+                for doc in result["docs"]:
+                    if doc.metadata.get('source', False):
+                        container.write(f" * {doc.metadata['source']}")
 
             with st.sidebar:
                 st.divider()
                 if "docs" in result and \
                     len(result["docs"]) > 0:
-                    st.sidebar.markdown("### Discovered Sources")
+                    st.sidebar.markdown("### Search details")
                     with st.spinner("Compiling sources..."):                    
                         for doc in result["docs"]:
                             with st.sidebar.container(border=True):
                                 # st.sidebar.info(doc.state['query_similarity_score'])
-                                st.sidebar.info(doc.metadata['relevance_score'])
+                                st.sidebar.info(f"Score: {doc.metadata['relevance_score']}")
                                 st.sidebar.write(doc.page_content)
                                 st.sidebar.json(doc.metadata)
                                 

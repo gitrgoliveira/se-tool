@@ -5,12 +5,6 @@ from langchain_core.prompts import PromptTemplate
 
 
 def prompt_from_model(model_name: str) -> str:
-    # default model replacement
-    # template = ollama.show(model_name)['template'].replace("{{ .System }}", "{system}").replace("{{ .Prompt }}", "{prompt}")
-    
-    # if model_name.startswith("qwen") or \
-    #     model_name.startswith("mistral-openorca") or \
-    #         model_name.startswith("phi"):
     template = ollama.show(model_name)['template']\
         .replace("{{ if .System }}", "")\
         .replace("{{ end }}", "")\
@@ -43,8 +37,9 @@ def QA_prompt(model_name: str) -> PromptTemplate:
     prompt = template.format(
         system=(
             "You are a friendly assistant for question-answering tasks and an expert in HashiCorp technology. \n"
+            "All questions are in the context of HashiCorp products. \n"
             "Use the following pieces of retrieved context to answer the question, together with the chat history and your own knowledge. \n"
-            "If you don't know the answer, just say that you don't know or ask questions to clarify. Keep the answer concise, in markdown format, and always add external references to your source of knowledge. \n"
+            "If you don't know the answer, just say that you don't know and ask for clarification. Keep the answer concise. Use markdown format. Provide external references for verification. \n"
         ), prompt=(
             "Chat History: {chat_history} \n" 
             "Question: {question} \n"
@@ -56,8 +51,23 @@ def QA_prompt(model_name: str) -> PromptTemplate:
     return PromptTemplate.from_template(prompt)
                                         # partial_variables={'chat_history': ''})
 
+def search_prompt(model_name: str) -> PromptTemplate:
+    template = prompt_from_model(model_name=model_name)
+    prompt = template.format(
+        system=(
+            "You are a friendly search assistant and an expert in HashiCorp technology. \n"
+            "All questions are in the context of HashiCorp products. \n"
+            "Use only the pieces of retrieved context to answer the question. \n"
+            "If you don't know the answer, just say you don't know. Keep the answer concise. Use markdown format. Provide external references for verification. \n"
+        ), prompt=(
+            "Question: {question} \n"
+            "Context: {context} \n"
+            "Answer:"
+        )
+    )
     
-    
+    return PromptTemplate.from_template(prompt)
+
 
 # MISTRAL_INSTRUCT_PROMPT = PromptTemplate.from_template(mistral_instruct_prompt_template,
 #                                                        partial_variables={'chat_history': ''})

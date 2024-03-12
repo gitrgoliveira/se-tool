@@ -25,22 +25,23 @@ def hashi_writer ():
                             placeholder="Paste your text here", label_visibility="collapsed")
 
         prompt_options = [
-            "0 - Summarise meeting notes",
-            "1 - Convert text to Feature Request format",
-            "2 - Simplify the input language",
-            "3 - Improve the writing of the text",
-            "4 - Extract action points",
-            "5 - Change the input to a friendly tone",
-            "6 - Change the input to a confident tone",
-            "7 - Change the input to a professional tone",
-            "8 - Make the input shorter",
-            "9 - Make the input longer",
-            "9 - Brainstorm ideas on this subject"
+            "00 - Summarise meeting notes",
+            "01 - Convert text to Feature Request format",
+            "02 - Simplify the text language",
+            "03 - Improve the writing of the text",
+            "04 - Extract action points",
+            "05 - Summarize this text",
+            "06 - Change the text to a friendly tone",
+            "07 - Change the text to a confident tone",
+            "08 - Change the text to a professional tone",
+            "09 - Make the text half of its length",
+            "10 - Make the text double its length",
+            "11 - Brainstorm ideas on this subject"
         ]
 
         prompt_selected = st.selectbox("Select the action", options=prompt_options)
         if prompt_selected != None:
-            if prompt_selected [0] == "0":
+            if prompt_selected.startswith("00"):
                 prompt_selected = ("Use Markdown in your answer. Use the following format for the input meeting notes \n",
                                    "### Agenda: \n",
                                    "High-level main topics that were discussed in the meeting notes. Only 5 at most.\n",
@@ -52,7 +53,7 @@ def hashi_writer ():
                                    "Any actions points implied in the meeting notes\n",
                                    )
 
-            elif prompt_selected[0] =="1":
+            elif prompt_selected.startswith("01"):
                 prompt_selected = ("Use Markdown format in your answer. Convert the input text to the following Feature Request format \n",
                                    "### Summary/Description of Request (255 Characters or less): \n",
                                    "### Description & Workarounds (What use case or workflow is the customer trying to accomplish? What workarounds have they tried or other integrations are they using to accomplish this?): \n",
@@ -60,7 +61,7 @@ def hashi_writer ():
                                    "### Business Impact (How will this affect the customer's ability to use the product?): \n"
                                    )
             else:
-                prompt_selected = prompt_selected[3:]
+                prompt_selected = prompt_selected[5:]
              
         start_button = st.button("Process",
                                  use_container_width=True,
