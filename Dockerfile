@@ -25,4 +25,4 @@
     EXPOSE 8501
 
     # Run app.py when the container launches
-    CMD ["streamlit", "run", "--ui.hideTopBar=True", "--global.developmentMode=False", "streamlit_chat.py"]
+    CMD ["streamlit", "run", "--ui.hideTopBar=True", "--global.developmentMode=False", "main.py"]
