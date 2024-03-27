@@ -2,6 +2,7 @@
 #### V1
 1. Use embeddings from common crawler
 2. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. 
+3. Add tab to help RFP writing
 #### V3
 1. Work on Image recognition/extraction
 #### V4
