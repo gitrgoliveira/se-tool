@@ -19,6 +19,7 @@ from langchain_community.llms.ollama import Ollama
 from langchain_community.retrievers.bm25 import BM25Retriever
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.callbacks.manager import CallbackManager
+from langchain_core.callbacks.stdout import StdOutCallbackHandler
 from langchain_core.callbacks.streaming_stdout import (
     StreamingStdOutCallbackHandler)
 from langchain_core.retrievers import BaseRetriever
@@ -112,7 +113,7 @@ def load_llm(llm_model: str = default_llm_model,
              temperature=0.0) -> Ollama:
     
     if callback_manager is None:
-        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+        callback_manager = CallbackManager([StreamingStdOutCallbackHandler(), StdOutCallbackHandler()])
 
     ollama_host = host
     if ollama_host == "":
@@ -167,6 +168,9 @@ def get_retriever_bm25(documents):
 
 def get_vectorstore_chroma(persist_directory, embedding_function):
     vectorstore = Chroma(persist_directory=persist_directory, embedding_function=embedding_function)
+    vectorstore._client_settings.anonymized_telemetry = True
+    vectorstore._client_settings.chroma_product_telemetry_impl = ""
+    vectorstore._client_settings.chroma_telemetry_impl = ""
     return vectorstore
 
 def get_retriever_chroma(vectorstore: VectorStore):

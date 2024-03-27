@@ -14,13 +14,7 @@ def hashi_writer ():
     with col1:
         TEXT_AREA_HEIGHT = 400
         text = ""
-        # if 'result' in st.session_state:
-            # text = st.session_state['result']
-            # st.session_state['input'] = st.session_state['result']
-            # del st.session_state['result']
-        
-            # print ("reusing input: ",text)
-            
+                    
         query = st.text_area(label="Text to process", height=TEXT_AREA_HEIGHT, key="input", value=text,
                             placeholder="Paste your text here", label_visibility="collapsed")
 

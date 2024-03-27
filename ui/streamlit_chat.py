@@ -1,3 +1,5 @@
+import logging
+
 import streamlit as st
 from langchain.schema.runnable.config import RunnableConfig
 from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -65,8 +67,7 @@ def hashi_chat():
                 if 'chat_response' in st.session_state:
                     del st.session_state['chat_response']
                 st.error(ex)
-                print (ex)
-
+                logging.error(ex,exc_info=True)
         
     if 'chat_response' in st.session_state:
         chat_response = st.session_state['chat_response']

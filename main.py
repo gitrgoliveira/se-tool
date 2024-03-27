@@ -83,8 +83,6 @@ def settings():
         
     if load_llm_button:
         with st.spinner("Loading language model..."):
-            if 'qa' in st.session_state:
-                del st.session_state['qa']
             if 'search' in st.session_state:
                 del st.session_state['search']
             if 'chat' in st.session_state:
@@ -96,7 +94,6 @@ def settings():
             st.session_state['llm'] = load_llm(llm_model=st.session_state['llm_model'],
                                                    host=ollama_host,
                                                    temperature=temperature)
-            st.session_state['qa'] = get_hashi_chat(llm=st.session_state['llm'] )
             st.session_state['search'] = get_hashi_search(llm=st.session_state['llm'] )
             st.session_state['chat'] = get_hashi_chat(llm=st.session_state['llm'] )
             st.toast(f"Loaded {st.session_state.get('llm_model')} with {temperature}")
