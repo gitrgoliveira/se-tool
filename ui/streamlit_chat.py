@@ -4,7 +4,7 @@ from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from ui.streamlit_shared import StreamHandler, display_result
 
-        
+
 def hashi_chat():
     st.header("Your personal assistant")
     
@@ -37,7 +37,8 @@ def hashi_chat():
                 stream_handler = StreamHandler(chat_box, display_method='write', ctx=ctx)    
 
                 inputs = {"question": str(prompt).strip()}
-                response = chat.invoke(inputs, config=RunnableConfig(callbacks=[stream_handler]))
+                with st.spinner():
+                    response = chat.invoke(inputs, config=RunnableConfig(callbacks=[stream_handler]))
                 # response = st.write_stream(chat.stream(inputs, config=RunnableConfig(callbacks=[stream_handler])))
                 st.session_state['chat_response'] = response
                 final_response = response['answer']
@@ -61,7 +62,8 @@ def hashi_chat():
                 st.write(final_response)
                 
             except Exception as ex:
-                del st.session_state['chat_response']
+                if 'chat_response' in st.session_state:
+                    del st.session_state['chat_response']
                 st.error(ex)
                 print (ex)
 

@@ -15,9 +15,11 @@ from langchain.text_splitter import (  # RecursiveCharacterTextSplitter,
     MarkdownTextSplitter, NLTKTextSplitter,
     SentenceTransformersTokenTextSplitter)
 from langchain.vectorstores.utils import filter_complex_metadata
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
-from langchain_community.document_transformers import Html2TextTransformer
-from langchain_community.embeddings import (  # HuggingFaceEmbeddings,
+from langchain_community.document_loaders.directory import (DirectoryLoader,
+                                                            TextLoader)
+from langchain_community.document_transformers.html2text import (
+    Html2TextTransformer)
+from langchain_community.embeddings.huggingface import (  # HuggingFaceEmbeddings,
     HuggingFaceBgeEmbeddings, HuggingFaceInstructEmbeddings)
 from langchain_community.vectorstores.chroma import Chroma
 

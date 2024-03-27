@@ -10,11 +10,13 @@ from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import (
     DocumentCompressorPipeline, EmbeddingsFilter)
 from langchain.retrievers.merger_retriever import MergerRetriever
-from langchain_community.document_transformers import (
-    EmbeddingsClusteringFilter, EmbeddingsRedundantFilter, LongContextReorder)
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.document_transformers.embeddings_redundant_filter import (
+    EmbeddingsRedundantFilter)
+from langchain_community.document_transformers.long_context_reorder import (
+    LongContextReorder)
+from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.llms.ollama import Ollama
-from langchain_community.retrievers import BM25Retriever
+from langchain_community.retrievers.bm25 import BM25Retriever
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.callbacks.manager import CallbackManager
 from langchain_core.callbacks.streaming_stdout import (
@@ -126,13 +128,24 @@ def load_llm(llm_model: str = default_llm_model,
         # num_gpu=GPU_THREADS,
         # num_thread=CPU_THREADS,
         temperature=temperature,
-        num_ctx=4096,
+        num_ctx=get_ctx_from_llm(llm_model),
         # top_p=0.5,
         top_k=10,
         verbose=True,
         callback_manager=callback_manager,
         )
 
+def get_ctx_from_llm(llm_model: str):
+    if llm_model.find("mistral"):
+        return 32768
+    if llm_model.startswith("qwen") or llm_model.startswith("gemma"):
+        return 8192
+    if llm_model.startswith("phi"):
+        return 2048
+    
+    return 4096
+        
+    
 def get_retriever_tfidf(documents):
     from langchain.retrievers import TFIDFRetriever
     tfidf_retriever = TFIDFRetriever.from_documents(
@@ -161,7 +174,7 @@ def get_retriever_chroma(vectorstore: VectorStore):
         search_type="similarity_score_threshold",
         search_kwargs={
             "k": 10,
-            "score_threshold": 0.65
+            "score_threshold": 0.55
             }
         
         # search_type="mmr", # this makes all vector stores return results regardless of quality
@@ -221,17 +234,6 @@ def get_pipeline_retriever(merger_retriever, filter_embeddings, use_filters=Fals
     
     transformers.append(reordering)
     
-    # relevant_filter = EmbeddingsFilter(embeddings=filter_embeddings, k=10)
-
-    # filter_ordered_cluster = EmbeddingsClusteringFilter(
-    #     embeddings=filter_embeddings,
-    #     num_clusters=5,
-    #     num_closest=2,
-    # )
-    # from langchain.retrievers.document_compressors import LLMChainFilter
-    # from langchain.retrievers.document_compressors import LLMChainExtractor
-
-    # filter = LLMChainFilter()
     pipeline = DocumentCompressorPipeline(transformers=transformers)
     
     compression_retriever = ContextualCompressionRetriever(
@@ -239,8 +241,6 @@ def get_pipeline_retriever(merger_retriever, filter_embeddings, use_filters=Fals
     )
     
     return compression_retriever
-
-
 
 
 def get_filter_embedding():
