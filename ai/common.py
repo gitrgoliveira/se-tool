@@ -137,7 +137,7 @@ def load_llm(llm_model: str = default_llm_model,
         )
 
 def get_ctx_from_llm(llm_model: str):
-    if llm_model.find("mistral"):
+    if llm_model.startswith("mistral"):
         return 32768
     if llm_model.startswith("qwen") or llm_model.startswith("gemma"):
         return 8192
@@ -167,10 +167,12 @@ def get_retriever_bm25(documents):
     return bm25_retriever
 
 def get_vectorstore_chroma(persist_directory, embedding_function):
+    # from chromadb.config import Settings
+    # client_settings = Settings()
     vectorstore = Chroma(persist_directory=persist_directory, embedding_function=embedding_function)
     vectorstore._client_settings.anonymized_telemetry = True
-    vectorstore._client_settings.chroma_product_telemetry_impl = ""
-    vectorstore._client_settings.chroma_telemetry_impl = ""
+    # vectorstore._client_settings.chroma_product_telemetry_impl = ""
+    # vectorstore._client_settings.chroma_telemetry_impl = ""
     return vectorstore
 
 def get_retriever_chroma(vectorstore: VectorStore):
