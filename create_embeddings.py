@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 import sys
@@ -6,7 +7,10 @@ from ai.embed_hashicorp import (check_github_token, create_git_embeddings,
                                 create_website_embeddings, output_ai,
                                 wait_until_finished)
 
-if __name__ == "__main__":
+def main(base_path):
+    """
+    Main function to create embeddings and save them to the specified base path.
+    """
     # logging.getLogger().setLevel(logging.DEBUG)
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     
@@ -14,12 +18,24 @@ if __name__ == "__main__":
     if check_github_token() is None:
         logging.error("No GitHub token found. Exiting.")
         exit(1)
-    base_path = os.path.join(output_ai, "web")    
-    create_website_embeddings(base_path)
+        
+    base_path_web = os.path.join(base_path, "web")
+    create_website_embeddings(base_path_web)
     
-    base_path = os.path.join(output_ai, "git")    
-    create_git_embeddings(base_path)
-    
+    # base_path_git = os.path.join(base_path, "git")    
+    # create_git_embeddings(base_path_git)
+        
     # Shutdown the processor
     wait_until_finished()
     logging.info("Finished creating embeddings. Exiting.")
+
+
+if __name__ == "__main__":
+    """
+    Parse command line arguments and start the main function.
+    """
+    parser = argparse.ArgumentParser(description='Create embeddings.')
+    parser.add_argument('--base_path', default=output_ai, help='Base path for output')
+    args = parser.parse_args()
+
+    main(args.base_path)

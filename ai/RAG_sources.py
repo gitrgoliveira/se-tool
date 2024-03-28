@@ -1,6 +1,7 @@
 # Description: This file contains the list of URLs for the RAG report
 
 # List of URLs to be searched
+# "name" needs to be unique, because it will be the folder where the database is stored
 website_urls = [
     {
         "name": "hashicorp_vault",
@@ -109,7 +110,21 @@ website_urls = [
         "url": "https://www.hashicorp.com/events/webinars/recorded?type=all",
         "depth": 5,
         "prevent_outside": True
-    }
+    },
+    {
+        "name": "hashicorp_support",
+        "url": "https://support.hashicorp.com/hc/en-us",
+        "depth": 5,
+        "prevent_outside": True
+    },
+    {
+        "name": "hashicorp_discuss",
+        "url": "https://discuss.hashicorp.com/",
+        "depth": 5,
+        "prevent_outside": True
+    },
+    
+    
 ]
 # List of repositories and their corresponding documentation folders
 repos_and_folders = [
