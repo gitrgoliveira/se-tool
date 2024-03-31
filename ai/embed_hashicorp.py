@@ -213,7 +213,10 @@ def create_embeddings(name, documents, output_path):
     result = index(documents, record_manager, vectorstore, cleanup="full", source_id_key="source")
     
     info(f"Results: {result}")
-
+    # writes the results in a ".done" file with the same folder as confirmation.
+    with open(f"{output_path}/results.done", "w") as file:
+        file.write(str(result))
+    
     # vectorstore = Chroma.from_documents(documents=documents,
     #                                     embedding=hf_bge_embeddings,
     #                                     persist_directory=output_path)
@@ -282,7 +285,7 @@ def check_github_token():
         error("GITHUB_PERSONAL_ACCESS_TOKEN not set.")
     return token
 
-def create_git_embeddings(base_path):
+def create_git_embeddings(base_path: str, only_missing_embeddings: bool):
     if check_github_token() is None:
         return
     
@@ -291,6 +294,8 @@ def create_git_embeddings(base_path):
         name = repo_name(repo_info["repo_url"])
         repo_path = os.path.join(output_repos, name)
         output_path = os.path.join(base_path, name)
+        if only_missing_embeddings and os.path.exists(output_path):
+            continue
         future = load_processor.submit_job(load_documents_git, repo_path, repo_info["repo_url"])
         jobs.append((repo_info["repo_url"], output_path, future))
     
@@ -305,10 +310,12 @@ def create_git_embeddings(base_path):
     
 
 
-def create_website_embeddings(base_path):
+def create_website_embeddings(base_path: str, only_missing_embeddings: bool):
     jobs = []
     for website_url in website_urls:
         output_path = os.path.join(base_path, website_url['name'])
+        if only_missing_embeddings and os.path.exists(output_path):
+            continue
         future = load_processor.submit_job(recursive_website_loader, website_url)
         jobs.append((website_url['name'], output_path, future))
     

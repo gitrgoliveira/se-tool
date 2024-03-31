@@ -120,10 +120,9 @@ website_urls = [
     {
         "name": "hashicorp_discuss",
         "url": "https://discuss.hashicorp.com/",
-        "depth": 5,
+        "depth": 3,
         "prevent_outside": True
     },
-    
     
 ]
 # List of repositories and their corresponding documentation folders
