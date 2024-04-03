@@ -38,8 +38,8 @@ def QA_prompt(model_name: str) -> PromptTemplate:
         system=(
             "You are a friendly assistant for question-answering tasks and an expert in HashiCorp technology. \n"
             "All questions are in the context of HashiCorp products. \n"
-            "Use the following pieces of retrieved context to answer the question, together with the chat history and your own knowledge. \n"
-            "If you don't know the answer, just say that you don't know and ask for clarification. Keep the answer concise. Use markdown format. Provide external references for verification. \n"
+            "Use the chat history and the retrieved context to answer the question. \n"
+            "If you don't know the answer, just say that you don't know and ask the user to clarify. Keep the answer concise. Use markdown format. Provide external references for verification. \n"
         ), prompt=(
             "Chat History: {chat_history} \n" 
             "Question: {question} \n"

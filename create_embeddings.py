@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Create embeddings.')
     parser.add_argument('--base_path', default=output_ai, help='Base path for output')
     parser.add_argument('--only_missing', action='store_true', dest='only_missing_embeddings',
-                        help='Only retrieve missing embeddings', default=True)
+                        help='Only retrieve missing embeddings', default=False)
     args = parser.parse_args()
 
     main(args.base_path, args.only_missing_embeddings)
