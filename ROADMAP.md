@@ -3,8 +3,10 @@
 1. Use embeddings from common crawler
 2. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. 
 3. Add tab to help RFP writing
+4. Agent to check if a statement "Is True or False and explain why".
 #### V3
 1. Work on Image recognition/extraction
+2. May need to change the database to be a single one. Maybe based on DeepLake.
 #### V4
 1. Add tab to help PRD writing
 2. Add tab to help RFC writing
