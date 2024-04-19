@@ -7,10 +7,14 @@ from langchain_core.prompts import PromptTemplate
 def prompt_from_model(model_name: str) -> str:
     template = ollama.show(model_name)['template']\
         .replace("{{ if .System }}", "")\
+        .replace("{{ if .Prompt }}", "")\
         .replace("{{ end }}", "")\
         .replace("{{- if .System }}", "")\
         .replace("{{- end }}", "")\
         .replace("{{ .Response }}<end_of_turn>", "")\
+        .replace("{{ .Response }}<|im_end|>", "")\
+        .replace("{{ .Response }}<|END_OF_TURN_TOKEN|>", "")\
+        .replace("{{ .Response }}<|eot_id|>", "")\
         .replace("{{ .System }}", " {system} ")\
         .replace("{{ .Prompt }}", " {prompt} ")
         
