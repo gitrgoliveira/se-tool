@@ -1,7 +1,9 @@
 ## HashiCorp Personal Assistant TODO
 #### V1
+1. Parent retriever for docs (done)
+2. Emsemble retriever for docs instead of merger, to give a bigger weight to the loaded docs. 
 1. Use embeddings from common crawler
-2. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. 
+2. Allow for search of RAG, duckduckGo, python runner and url verifier with multiple agent steps/chain. : https://python.langchain.com/docs/integrations/chat/ollama_functions/
 3. Add tab to help RFP writing
 4. Agent to check if a statement "Is True or False and explain why".
 #### V3

@@ -157,13 +157,35 @@ def get_ctx_from_llm(llm_model: str):
         
 def get_retriever_svm (documents, embeding_function):
     from langchain_community.retrievers.svm import SVMRetriever
-    
     retriever = SVMRetriever.from_documents(documents=documents, embeddings=embeding_function)
     retriever.relevancy_threshold = 0.55
     retriever.k = 10
     
     return retriever
+
+def get_retriever_parent (documents, embeding_function):
+    from langchain.retrievers import ParentDocumentRetriever
+    from langchain_community.vectorstores import InMemoryVectorStore
+
+    from langchain.storage import InMemoryStore
+    from langchain_community.document_loaders import TextLoader
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=512)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2048)
+
+    vectorstore = InMemoryVectorStore(embedding=embeding_function)
+    store = InMemoryStore()
+    retriever = ParentDocumentRetriever(
+        vectorstore=vectorstore,
+        docstore=store,
+        child_splitter=child_splitter,
+        parent_splitter=parent_splitter,
+    )
     
+    retriever.add_documents(documents)
+    
+    return retriever
     
 def get_retriever_tfidf(documents):
     from langchain_community.retrievers.tfidf import TFIDFRetriever
@@ -327,8 +349,10 @@ def load_extra_retriever() -> BaseRetriever:
         return None
     
     logging.info(f"Adding SVM retriever with extra documents.")
-    svm_retriever = get_retriever_svm(documents, embedding_function)
-    return svm_retriever
+    # retriever = get_retriever_svm(documents, embedding_function)
+    retriever = get_retriever_parent(documents, embedding_function)
+    
+    return retriever
 
 # returns an array of documents from the extra_files folder
 def load_extra_files(path):
@@ -357,7 +381,8 @@ def load_and_split_pdf(path) -> List[Document]:
         from langchain_community.document_loaders.pdf import PyPDFLoader
         loader = PyPDFLoader(path, extract_images=False)
         docs = loader.load()
-        return split_text(docs)
+        # return split_text(docs)
+        return docs
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
@@ -368,7 +393,8 @@ def load_and_split_docx(path) -> List[Document]:
             UnstructuredWordDocumentLoader)
         loader = UnstructuredWordDocumentLoader(path)
         docs = loader.load()
-        return split_text(docs)
+        # return split_text(docs)
+        return docs
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
@@ -379,7 +405,8 @@ def load_and_split_xlsx(path) -> List[Document]:
             UnstructuredExcelLoader)
         loader = UnstructuredExcelLoader(path, mode="elements")
         docs = loader.load()
-        return split_text(docs)
+        # return split_text(docs)
+        return docs
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
@@ -390,7 +417,8 @@ def load_and_split_pptx(path) -> List[Document]:
             UnstructuredPowerPointLoader)
         loader = UnstructuredPowerPointLoader(path)
         docs = loader.load()
-        return split_text(docs)
+        # return split_text(docs)
+        return docs
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []

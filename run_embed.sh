@@ -11,6 +11,7 @@ pip install --upgrade pip
 pip install -r requirements.streamlit.txt
 playwright install
 ulimit -n 10240
+export ANONYMIZED_TELEMETRY=False
 
 if [ -z "$GITHUB_PERSONAL_ACCESS_TOKEN" ]
 then
