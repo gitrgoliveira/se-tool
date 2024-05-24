@@ -1,7 +1,7 @@
 import logging
 
 import streamlit as st
-from langchain.schema.runnable.config import RunnableConfig
+from langchain_core.runnables import RunnableConfig
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from ui.streamlit_shared import StreamHandler, display_result

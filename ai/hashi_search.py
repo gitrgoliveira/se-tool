@@ -3,9 +3,10 @@
 import logging
 from operator import itemgetter
 
-from langchain.schema import StrOutputParser, format_document
 from langchain_community.llms.ollama import Ollama
-from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate, format_document
+from langchain_core.retrievers import BaseRetriever
 
 import ai.hashi_prompts as hashi_prompts
 from ai.common import get_retriever, load_llm
@@ -84,14 +85,14 @@ def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_s
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)
 
-def get_hashi_search(llm=None, callback_manager=None):
+def get_hashi_search(llm=None, callback_manager=None, extra_retriever: BaseRetriever = None):
     if llm == None:
         logging.debug("Loading a new LLM")
         loaded_llm = load_llm(callback_manager=callback_manager)
     else:
         loaded_llm=llm
         
-    retriever = get_retriever(loaded_llm, use_filters=True, multi_query=True)
+    retriever = get_retriever(loaded_llm, use_filters=True, multi_query=True, extra_retriever=extra_retriever)
     
     search = retrieval_search_chain(
         llm=loaded_llm, retriever=retriever

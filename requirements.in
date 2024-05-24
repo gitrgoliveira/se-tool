@@ -1,0 +1,13 @@
+chromadb==0.5.0
+flashrank==0.2.5
+langchain
+langchain-community
+ollama
+openpyxl
+python-pptx
+sentence_transformers
+streamlit
+torch
+tqdm
+unstructured
+xlrd

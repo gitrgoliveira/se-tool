@@ -1,8 +1,8 @@
 import ai.hashi_prompts as hashi_prompts
 import streamlit as st
-from langchain.schema.runnable.config import RunnableConfig
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from ui.streamlit_shared import StreamHandler, display_result
@@ -22,7 +22,8 @@ def hashi_writer ():
             "00 - Summarise meeting notes",
             "01 - Convert text to Feature Request format",
             "02 - Simplify the text language",
-            "03 - Improve the writing of the text",
+            "03 - Improve how this text is written",
+            "03 - Rewrite this text to be more clear, concise, and engaging",
             "04 - Extract action points",
             "05 - Summarize this text",
             "06 - Change the text to a friendly tone",

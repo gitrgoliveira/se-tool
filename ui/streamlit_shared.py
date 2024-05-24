@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Sequence
 from uuid import UUID
 
 import streamlit as st
-from langchain.callbacks.base import BaseCallbackHandler
+from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.documents import Document
 from langchain_core.outputs import LLMResult
 from streamlit.delta_generator import DeltaGenerator

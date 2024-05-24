@@ -9,6 +9,7 @@ streamlit_env
 cache/*
 cache_docker/*
 env
+venv
 embed
 archive
 
@@ -21,3 +22,5 @@ my-app
 terraform
 .DS_Store
 *.zip
+docs/*
+!docs/INSTRUCTIONS.md

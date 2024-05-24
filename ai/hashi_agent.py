@@ -6,13 +6,8 @@ from langchain.agents import (AgentExecutor, AgentType, create_react_agent,
                               load_tools)
 from langchain.agents.agent_toolkits.conversational_retrieval.tool import (
     create_retriever_tool)
-from langchain.agents.agent_toolkits.playwright import PlayWrightBrowserToolkit
 from langchain.memory import ConversationSummaryMemory
-from langchain.tools import Tool
-from langchain.utils.openai_functions import (
-    convert_pydantic_to_openai_function)
-from langchain_community.tools.convert_to_openai import (
-    format_tool_to_openai_function)
+from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
 from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchResults
 from langchain_community.tools.playwright.utils import (
     create_async_playwright_browser)
@@ -24,6 +19,9 @@ from langchain_community.utils.ernie_functions import (
     convert_pydantic_to_ernie_function)
 from langchain_core.runnables import (RunnableLambda, RunnableParallel,
                                       RunnablePassthrough)
+from langchain_core.tools import Tool
+from langchain_core.utils.function_calling import (
+    convert_pydantic_to_openai_function, format_tool_to_openai_function)
 from pydantic import BaseModel, Field
 
 import ai.hashi_prompts as hashi_prompts

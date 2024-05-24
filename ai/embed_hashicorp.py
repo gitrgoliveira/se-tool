@@ -11,10 +11,6 @@ from dateutil.relativedelta import relativedelta
 # from bs4 import BeautifulSoup
 # from langchain.document_loaders.recursive_url_loader import RecursiveUrlLoader
 from langchain.indexes import SQLRecordManager, index
-from langchain.text_splitter import (  # RecursiveCharacterTextSplitter,
-    MarkdownTextSplitter, NLTKTextSplitter,
-    SentenceTransformersTokenTextSplitter)
-from langchain.vectorstores.utils import filter_complex_metadata
 from langchain_community.document_loaders.directory import (DirectoryLoader,
                                                             TextLoader)
 from langchain_community.document_transformers.html2text import (
@@ -22,6 +18,9 @@ from langchain_community.document_transformers.html2text import (
 from langchain_community.embeddings.huggingface import (  # HuggingFaceEmbeddings,
     HuggingFaceBgeEmbeddings, HuggingFaceInstructEmbeddings)
 from langchain_community.vectorstores.chroma import Chroma
+from langchain_community.vectorstores.utils import filter_complex_metadata
+from langchain_text_splitters import (MarkdownTextSplitter, NLTKTextSplitter,
+                                      SentenceTransformersTokenTextSplitter)
 
 from ai.RAG_sources import repos_and_folders, website_urls
 
@@ -107,6 +106,7 @@ def split_text(chunks):
         add_start_index=True,
         keep_separator = True
         )
+    stt_splitter._add_start_index = True
     
     debug("Filtering...")
     # chunks = text_splitter.split_documents(chunks)
@@ -273,7 +273,7 @@ def recursive_website_loader(url: dict):
                    max_depth=url['depth'], 
                    prevent_outside=url['prevent_outside'],
                    debug=True
-                   ).load_and_split(NLTKTextSplitter())
+                   ).load_and_split(NLTKTextSplitter(add_start_index=True))
     docs = html2text.transform_documents(docs)
     
     info(f"Loaded {len(docs)} documents from {url}")    

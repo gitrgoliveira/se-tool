@@ -13,10 +13,12 @@ def prompt_from_model(model_name: str) -> str:
         .replace("{{- end }}", "")\
         .replace("{{ .Response }}<end_of_turn>", "")\
         .replace("{{ .Response }}<|im_end|>", "")\
+        .replace("{{ .Response }}<|end|>", "")\
         .replace("{{ .Response }}<|END_OF_TURN_TOKEN|>", "")\
-        .replace("{{ .Response }}<|eot_id|>", "")\
+        .replace("{{ .Response }}", "")\
         .replace("{{ .System }}", " {system} ")\
         .replace("{{ .Prompt }}", " {prompt} ")
+        # .replace("{{ .Response }}<|eot_id|>", "")\
         
     if model_name.startswith("starling-lm"):
         template = ollama.show(model_name)['template'].replace("{{ .System }}", "{system}").replace("{{ .Prompt}}", "{prompt} ")

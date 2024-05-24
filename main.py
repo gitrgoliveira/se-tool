@@ -4,7 +4,8 @@ from typing import List
 import ollama
 import streamlit as st
 
-from ai.common import ModelDownloader, check_ollama_host, load_llm
+from ai.common import (ModelDownloader, check_ollama_host,
+                       load_extra_retriever, load_llm)
 from ai.hashi_chat import get_hashi_chat
 from ai.hashi_search import get_hashi_search
 from ui.streamlit_assistant import hashi_assistant
@@ -78,10 +79,19 @@ def settings():
                                      label_visibility="collapsed",
                                      index=index)
 
-    temperature = st.sidebar.slider("Less or more creative?", min_value=0.0, max_value=1.0, value=0.5, step=.1)
-    load_llm_button = st.button("Load model", use_container_width=True, type="primary")    
-        
-    if load_llm_button:
+    temperature = st.sidebar.slider("Less or more creative?", min_value=0.0, max_value=1.0, value=0.1, step=.1)
+    load_llm_button = st.button("Load model", use_container_width=True, type="primary")
+    reload_extra_docs_disabled = False
+    if st.session_state.get('extra_retriever', None) == None or load_llm_button:
+        reload_extra_docs_disabled = True
+    reload_extra_docs = st.button("Reload extra docs", use_container_width=True, type="secondary", disabled=reload_extra_docs_disabled)    
+    
+    if reload_extra_docs:
+        with st.spinner("Reloading extra docs..."):
+            st.session_state['extra_retriever'] = load_extra_retriever()
+            st.toast("Reloaded extra docs")
+    
+    if load_llm_button or reload_extra_docs:
         with st.spinner("Loading language model..."):
             if 'search' in st.session_state:
                 del st.session_state['search']
@@ -94,8 +104,16 @@ def settings():
             st.session_state['llm'] = load_llm(llm_model=st.session_state['llm_model'],
                                                    host=ollama_host,
                                                    temperature=temperature)
-            st.session_state['search'] = get_hashi_search(llm=st.session_state['llm'] )
-            st.session_state['chat'] = get_hashi_chat(llm=st.session_state['llm'] )
+            
+            if st.session_state.get('extra_retriever', None) == None:
+                st.session_state['extra_retriever'] = load_extra_retriever()
+                if st.session_state.get('extra_retriever', None) != None:            
+                    st.toast("Reloaded extra docs")
+
+            st.session_state['search'] = get_hashi_search(llm=st.session_state['llm'],
+                                                          extra_retriever=st.session_state['extra_retriever'])
+            st.session_state['chat'] = get_hashi_chat(llm=st.session_state['llm'],
+                                                      extra_retriever=st.session_state['extra_retriever'])
             st.toast(f"Loaded {st.session_state.get('llm_model')} with {temperature}")
 
     if st.session_state.get('llm', None) == None:

@@ -4,10 +4,10 @@ import logging
 from operator import itemgetter
 
 from langchain.memory import ConversationSummaryMemory
-from langchain.schema import StrOutputParser, format_document
 from langchain_community.llms.ollama import Ollama
 from langchain_core.messages import get_buffer_string
-from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate, format_document
 from langchain_core.retrievers import BaseRetriever
 
 import ai.hashi_prompts as hashi_prompts
@@ -26,7 +26,7 @@ def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
     
     base_template = hashi_prompts.prompt_from_model(llm.model).format(
         system=("Given the following conversation and a follow up question, rephrase ",
-                "the follow up question to be a standalone question, in its original language."),
+                "the follow up question to be a standalone question, in its original language, tone and with corrected grammar and spelling."),
         prompt=("Chat History: \n",
                 "{chat_history}",
                 "\nFollow Up Input: {question} \n",
@@ -89,7 +89,7 @@ def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
     return final_chain
 
 
-def get_hashi_chat(llm=None, callback_manager=None):
+def get_hashi_chat(llm=None, callback_manager=None, extra_retriever: BaseRetriever = None):
     if llm == None:
         logging.debug("Loading a new LLM")
         loaded_llm = load_llm(callback_manager=callback_manager)
@@ -100,7 +100,7 @@ def get_hashi_chat(llm=None, callback_manager=None):
     memory = ConversationSummaryMemory(
         llm=loaded_llm, memory_key="chat_history", return_messages=True
         )
-    retriever = get_retriever(loaded_llm, use_filters=True)
+    retriever = get_retriever(loaded_llm, use_filters=True, extra_retriever=extra_retriever)
     
     qa = retrieval_qa_chain(
         llm=loaded_llm, retriever=retriever, memory=memory

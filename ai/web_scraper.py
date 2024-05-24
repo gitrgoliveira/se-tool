@@ -6,11 +6,11 @@ from typing import List, Optional
 from urllib.parse import urldefrag, urlparse
 
 from bs4 import BeautifulSoup
-from langchain.document_loaders.base import BaseLoader
-from langchain.text_splitter import TextSplitter
 from langchain_community.document_loaders.pdf import PyPDFLoader
+from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents.base import Document
 from langchain_core.utils.html import extract_sub_links
+from langchain_text_splitters import TextSplitter
 from playwright.async_api import Browser, Page, async_playwright
 
 
