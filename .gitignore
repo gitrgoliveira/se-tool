@@ -7,7 +7,9 @@ __pycache__/
 clean_env
 streamlit_env
 cache/*
+!cache/*.md
 cache_docker/*
+!cache_docker/*.md
 env
 venv
 embed
