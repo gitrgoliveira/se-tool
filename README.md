@@ -35,6 +35,16 @@ Mac with M1 Pro
 1. Have Ollama running -> see `run_ollama.sh`
 2. Run from source with `run_streamlit.sh`
 
+## Using own documentation
+
+You can drop multiple files into the `./docs` folder and the app will load and create temporary in-memory embeddings for them, when loading the LLM. Currently supported file extensions are:
+
+- csv
+- pdf
+- doc or docx
+- ppt or pptx
+- xls or xlsx
+
 ## Creating embeddings
 
 The quality of the answers only goes as far as the quality of the LLM, prompt and embeddings.
