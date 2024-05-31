@@ -19,11 +19,11 @@ def main(base_path: str, only_missing_embeddings: bool):
         logging.error("No GitHub token found. Exiting.")
         exit(1)
         
-    base_path_web = os.path.join(base_path, "web")
-    create_website_embeddings(base_path_web, only_missing_embeddings)
-    
     base_path_git = os.path.join(base_path, "git")    
     create_git_embeddings(base_path_git, only_missing_embeddings)
+        
+    base_path_web = os.path.join(base_path, "web")
+    create_website_embeddings(base_path_web, only_missing_embeddings)
         
     # Shutdown the processor
     wait_until_finished()
