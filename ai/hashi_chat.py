@@ -25,7 +25,7 @@ def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
 
     
     base_template = hashi_prompts.prompt_from_model(llm.model).format(
-        system=("Given the following conversation and a follow up question, rephrase ",
+        system=("All questions are in the context of HashiCorp products. Given the following conversation and a follow up question, rephrase ",
                 "the follow up question to be a standalone question, in its original language, tone and with corrected grammar and spelling."),
         prompt=("Chat History: \n",
                 "{chat_history}",

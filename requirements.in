@@ -1,9 +1,11 @@
 chromadb==0.5.0
 flashrank==0.2.5
+html2text
 langchain
 langchain-community
 ollama
 openpyxl
+playwright
 python-pptx
 sentence_transformers
 streamlit

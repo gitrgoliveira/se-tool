@@ -119,6 +119,8 @@ google-auth==2.29.0
     # via kubernetes
 googleapis-common-protos==1.63.0
     # via opentelemetry-exporter-otlp-proto-grpc
+greenlet==3.0.3
+    # via playwright
 grpcio==1.64.0
     # via
     #   chromadb
@@ -127,6 +129,8 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
+html2text==2024.2.26
+    # via -r requirements.in
 httpcore==1.0.5
     # via httpx
 httptools==0.6.1
@@ -328,6 +332,8 @@ pillow==10.3.0
     #   python-pptx
     #   sentence-transformers
     #   streamlit
+playwright==1.44.0
+    # via -r requirements.in
 posthog==3.5.0
     # via chromadb
 protobuf==4.25.3
@@ -355,6 +361,8 @@ pydantic-core==2.18.2
     # via pydantic
 pydeck==0.9.1
     # via streamlit
+pyee==11.1.0
+    # via playwright
 pygments==2.18.0
     # via rich
 pypdf==4.2.0
@@ -518,6 +526,7 @@ typing-extensions==4.12.0
     #   opentelemetry-sdk
     #   pydantic
     #   pydantic-core
+    #   pyee
     #   sqlalchemy
     #   streamlit
     #   torch

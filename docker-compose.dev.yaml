@@ -7,6 +7,7 @@ services:
     volumes:
       - ./output_ai_files:/app/output_ai_files
       - ./cache_docker:/app/cache
+      - ./docs:/app/docs
     ports:
       - 8501:8501
     environment:

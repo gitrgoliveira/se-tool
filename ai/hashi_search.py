@@ -25,7 +25,7 @@ def retrieval_search_chain(llm: Ollama, retriever):
     from langchain_core.runnables import RunnableLambda, RunnablePassthrough
     
     base_template = hashi_prompts.prompt_from_model(llm.model).format(
-        system=("Given the following question, rephrase it as a standalone question, in its original language \n"),
+        system=("All questions are in the context of HashiCorp products.Given the following question, rephrase it as a standalone question, in its original language \n"),
         prompt=("Question: {question} \n",
                 "Standalone question:")
     )

@@ -71,6 +71,8 @@ def hashi_assistant():
                                 # st.sidebar.info(doc.state['query_similarity_score'])
                                 st.sidebar.info(f"Score: {doc.metadata['relevance_score']}")
                                 st.sidebar.write(doc.page_content)
+                                if doc.metadata.get('text_as_html', False):
+                                    del doc.metadata['text_as_html']
                                 st.sidebar.json(doc.metadata)
                                 
                 else:
