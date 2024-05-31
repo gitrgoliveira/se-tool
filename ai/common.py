@@ -181,6 +181,11 @@ def get_retriever_parent (documents, embeding_function):
         docstore=store,
         child_splitter=child_splitter,
         parent_splitter=parent_splitter,
+        search_kwargs={
+            "k": 5,
+            "score_threshold": 0.55
+            },
+        search_type="similarity_score_threshold",
     )
     
     retriever.add_documents(documents)
