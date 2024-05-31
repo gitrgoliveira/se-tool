@@ -21,7 +21,7 @@ fi
 
 if [ -z "$1" ]
 then
-  python create_embeddings.py
+  python create_embeddings.py --only_missing
 else
-  python create_embeddings.py --base_path $1
+  python create_embeddings.py --base_path $1 --only_missing
 fi

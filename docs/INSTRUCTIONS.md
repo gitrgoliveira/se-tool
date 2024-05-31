@@ -1,7 +1,7 @@
 ## Instructions
 
 SECT will load up any documents placed in this folder.
-Currently suported file extensions:
+Currently supported file extensions:
 - csv
 - pdf
 - doc or docx
