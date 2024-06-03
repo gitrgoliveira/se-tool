@@ -49,12 +49,19 @@ def hashi_writer ():
                                    )
 
             elif prompt_selected.startswith("01"):
-                prompt_selected = ("Use Markdown format in your answer. Convert the input text to the following Feature Request format \n",
-                                   "### Summary/Description of Request (255 Characters or less): \n",
-                                   "### Description & Workarounds (What use case or workflow is the customer trying to accomplish? What workarounds have they tried or other integrations are they using to accomplish this?): \n",
-                                   "### Expected Outcome (What would the customer like to achieve from this request?): \n",
-                                   "### Business Impact (How will this affect the customer's ability to use the product?): \n"
-                                   )
+                prompt_selected = """
+                                    Transform the customer's feature request description into a comprehensive problem statement. Ensure the following elements are included:
+                                        1. Detailed description of the problem the customer is experiencing.
+                                        2. Desired outcome that the customer wants to achieve.
+                                        3. Any workarounds or solutions that have already been tried.
+                                        4. The business impact of the feature request.
+
+                                    Output:
+                                    - Problem Description: 
+                                    - Desired Outcome: 
+                                    - Attempted Workarounds: 
+                                    - Business Impact: 
+                                    """
             else:
                 prompt_selected = prompt_selected[5:]
              
