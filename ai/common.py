@@ -157,7 +157,8 @@ def get_ctx_from_llm(llm_model: str):
         
 def get_retriever_svm (documents, embeding_function):
     from langchain_community.retrievers.svm import SVMRetriever
-    retriever = SVMRetriever.from_documents(documents=documents, embeddings=embeding_function)
+    split_docs = split_text(documents)
+    retriever = SVMRetriever.from_documents(documents=split_docs, embeddings=embeding_function)
     retriever.relevancy_threshold = 0.55
     retriever.k = 10
     
@@ -183,9 +184,8 @@ def get_retriever_parent (documents, embeding_function):
         parent_splitter=parent_splitter,
         search_kwargs={
             "k": 5,
-            "score_threshold": 0.55
             },
-        search_type="similarity_score_threshold",
+        search_type="similarity",
     )
     
     retriever.add_documents(documents)
@@ -354,8 +354,8 @@ def load_extra_retriever() -> BaseRetriever:
         return None
     
     logging.info(f"Adding SVM retriever with extra documents.")
-    # retriever = get_retriever_svm(documents, embedding_function)
-    retriever = get_retriever_parent(documents, embedding_function)
+    retriever = get_retriever_svm(documents, embedding_function)
+    # retriever = get_retriever_parent(documents, embedding_function)
     
     return retriever
 
@@ -368,68 +368,60 @@ def load_extra_files(path):
     for file in os.listdir(path):
         logging.info(f"Loading {file}")
         if file.endswith(".pdf"):
-            extra_documents.extend(load_and_split_pdf(os.path.join(path, file)))
+            extra_documents.extend(load_pdf(os.path.join(path, file)))
         elif file.endswith(".docx") or file.endswith(".doc"):
-            extra_documents.extend(load_and_split_docx(os.path.join(path, file)))
+            extra_documents.extend(load_docx(os.path.join(path, file)))
         elif file.endswith(".xlsx") or file.endswith(".xls") or file.endswith(".xlsm"):
-            extra_documents.extend(load_and_split_xlsx(os.path.join(path, file)))
+            extra_documents.extend(load_xlsx(os.path.join(path, file)))
         elif file.endswith(".pptx") or file.endswith(".ppt"):
-            extra_documents.extend(load_and_split_pptx(os.path.join(path, file)))
+            extra_documents.extend(load_pptx(os.path.join(path, file)))
         elif file.endswith(".csv"):
-            extra_documents.extend(load_and_split_csv(os.path.join(path, file)))
+            extra_documents.extend(load_csv(os.path.join(path, file)))
         
             
     return extra_documents
 
-def load_and_split_pdf(path) -> List[Document]:
+def load_pdf(path) -> List[Document]:
     try: 
         from langchain_community.document_loaders.pdf import PyPDFLoader
         loader = PyPDFLoader(path, extract_images=False)
-        docs = loader.load()
-        # return split_text(docs)
-        return docs
+        return loader.load()
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
 
-def load_and_split_docx(path) -> List[Document]:
+def load_docx(path) -> List[Document]:
     try:
         from langchain_community.document_loaders.word_document import (
             UnstructuredWordDocumentLoader)
         loader = UnstructuredWordDocumentLoader(path)
-        docs = loader.load()
-        # return split_text(docs)
-        return docs
+        return loader.load()
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
 
-def load_and_split_xlsx(path) -> List[Document]:
+def load_xlsx(path) -> List[Document]:
     try:
         from langchain_community.document_loaders.excel import (
             UnstructuredExcelLoader)
         loader = UnstructuredExcelLoader(path, mode="elements")
-        docs = loader.load()
-        # return split_text(docs)
-        return docs
+        return loader.load()
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
 
-def load_and_split_pptx(path) -> List[Document]:
+def load_pptx(path) -> List[Document]:
     try:
         from langchain_community.document_loaders.powerpoint import (
             UnstructuredPowerPointLoader)
         loader = UnstructuredPowerPointLoader(path)
-        docs = loader.load()
-        # return split_text(docs)
-        return docs
+        return loader.load()
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
     return []
 
 
-def load_and_split_csv(path) -> List[Document]:
+def load_csv(path) -> List[Document]:
     try:
         from langchain_community.document_loaders.csv_loader import CSVLoader
         loader = CSVLoader(file_path=path, autodetect_encoding=True)
