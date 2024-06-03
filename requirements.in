@@ -1,5 +1,5 @@
-chromadb==0.5.0
-flashrank==0.2.5
+chromadb
+flashrank
 html2text
 langchain
 langchain-community
