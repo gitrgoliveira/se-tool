@@ -1,6 +1,10 @@
 # Solutions Engineer Companion Tool
 
-This is a tool I made to help HashiCorp Solutions Engineers in their day to day work.
+This is a tool I made to help HashiCorp Solutions Engineers in their day-to-day work.
+It supports the following use cases:
+- Helping to write self-reflections, Feature Requests or generally improve writing.
+- Perform RAG on custom documents. Please see inside `./docs` for further instructions.
+- Perform RAG on public website information, created via the `run_embed.sh` script.
 
 ![SE Tool Screenshot](assets/Screenshot_se_tools.png)
 
