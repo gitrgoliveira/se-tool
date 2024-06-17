@@ -201,7 +201,7 @@ langsmith==0.1.65
     #   langchain
     #   langchain-community
     #   langchain-core
-llama-cpp-python==0.2.67
+llama-cpp-python==0.2.72
     # via flashrank
 lxml==5.2.2
     # via
@@ -499,7 +499,7 @@ torch==2.3.0
     # via
     #   -r requirements.in
     #   sentence-transformers
-tornado==6.4
+tornado==6.4.1
     # via streamlit
 tqdm==4.66.4
     # via
@@ -546,7 +546,7 @@ unstructured==0.14.3
     # via -r requirements.in
 unstructured-client==0.22.0
     # via unstructured
-urllib3==2.2.1
+urllib3==2.2.2
     # via
     #   kubernetes
     #   requests
