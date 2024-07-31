@@ -23,7 +23,9 @@ def get_model_list(ollama_host: str | None) -> List[str]:
     except Exception as e:
         st.error("Error loading Ollama model list {e}".format(e=e))
         return []
-    return [model['name'] for model in models['models']]
+    list_models = [model['name'] for model in models['models']]
+    list_models.sort()
+    return list_models
     
 # Create the Streamlit app
 def main():
