@@ -6,6 +6,7 @@ else
     python3 -m venv env
 fi
 source env/bin/activate
+export OLLAMA_FLASH_ATTENTION=1
 export ANONYMIZED_TELEMETRY=False
 export OLLAMA_HOST=http://127.0.0.1:11434
 pip install --upgrade pip
