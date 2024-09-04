@@ -14,10 +14,9 @@ from langchain_community.document_transformers.embeddings_redundant_filter impor
     EmbeddingsRedundantFilter)
 from langchain_community.document_transformers.long_context_reorder import (
     LongContextReorder)
-from langchain_community.embeddings.ollama import OllamaEmbeddings
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import ChatOllama, OllamaEmbeddings 
 from langchain_community.retrievers.bm25 import BM25Retriever
-from langchain_community.vectorstores.chroma import Chroma
+from langchain_chroma import Chroma
 from langchain_core.callbacks.manager import CallbackManager
 from langchain_core.callbacks.stdout import StdOutCallbackHandler
 from langchain_core.callbacks.streaming_stdout import (
@@ -94,7 +93,17 @@ class ModelDownloader:
     
     @classmethod
     def list(cls) -> Mapping[str, Any]:
-        return cls.cli.list() 
+        return cls.cli.list()
+    
+    def get_ctx_from_llm(cls, llm_model: str) -> int:
+        try:
+            model_info = cls.cli.show(llm_model).get('model_info')
+            for k in model_info:
+                if k.endswith("context_length"):
+                    return int(model_info[k])
+        except Exception as e:
+            logging.error(f"Error when getting context size for {llm_model}: {e}")
+            return 2048
  
  
  
@@ -108,12 +117,10 @@ def check_ollama_host(ollama_host: str) -> str:
     
     return url
 
-
-
 def load_llm(llm_model: str = default_llm_model,
              host: str = "",
              callback_manager=None,
-             temperature=0.0) -> Ollama:
+             temperature=0.0) -> ChatOllama:
     
     if callback_manager is None:
         callback_manager = CallbackManager([StreamingStdOutCallbackHandler(), StdOutCallbackHandler()])
@@ -124,16 +131,18 @@ def load_llm(llm_model: str = default_llm_model,
 
     ollama_host = check_ollama_host(ollama_host)
     logging.info(f"Loaded Ollama from {ollama_host}")
-    ModelDownloader(host=ollama_host).download_model(llm_model)
+    md = ModelDownloader(host=ollama_host)
+    md.download_model(llm_model)
     
-    return Ollama(
+    return ChatOllama(
         base_url=ollama_host,
         model=llm_model,
         mirostat=2,
         # num_gpu=GPU_THREADS,
         # num_thread=CPU_THREADS,
         temperature=temperature,
-        num_ctx=get_ctx_from_llm(llm_model),
+        num_ctx=md.get_ctx_from_llm(llm_model),
+        num_predict = -1,
         # top_p=0.5,
         top_k=10,
         verbose=True,
@@ -141,20 +150,6 @@ def load_llm(llm_model: str = default_llm_model,
         keep_alive="25m"
         )
 
-def get_ctx_from_llm(llm_model: str):
-    if llm_model.startswith("mistral"):
-        return 32768
-    if llm_model.startswith("qwen") \
-        or llm_model.startswith("gemma") \
-            or llm_model.startswith("llama3"):
-        return 8192
-    if llm_model.startswith("phi"):
-        return 2048
-    if llm_model.startswith("command-r"):
-        return 131072
-    
-    return 4096
-        
 def get_retriever_svm (documents, embeding_function):
     from langchain_community.retrievers.svm import SVMRetriever
     split_docs = split_text(documents)
