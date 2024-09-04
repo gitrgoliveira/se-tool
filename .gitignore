@@ -25,4 +25,5 @@ terraform
 .DS_Store
 *.zip
 docs/*
+docs_skip/*
 !docs/INSTRUCTIONS.md
