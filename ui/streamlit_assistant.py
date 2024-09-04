@@ -51,7 +51,7 @@ def hashi_assistant():
         st.success("Search results found!")
         try:
             container = st.container(border=True)
-            display_result(result["answer"], container=container)
+            display_result(result["answer"].content, container=container)
         
             if "docs" in result and \
                 len(result["docs"]) > 0:
