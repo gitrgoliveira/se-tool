@@ -3,12 +3,16 @@ flashrank
 html2text
 langchain
 langchain-community
+langchain-chroma
+langchain-ollama
+markdownify
 ollama
 openpyxl
 playwright
 python-pptx
 sentence_transformers
 streamlit
+streamlit-quill
 torch
 tqdm
 unstructured
