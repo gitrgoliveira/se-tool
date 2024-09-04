@@ -5,6 +5,10 @@ from langchain_core.runnables import RunnableConfig
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from ui.streamlit_shared import StreamHandler, display_result
+from langchain_community.chat_message_histories import (
+    StreamlitChatMessageHistory,
+)
+from langchain.memory import ConversationSummaryMemory
 
 
 def hashi_chat():
@@ -43,7 +47,7 @@ def hashi_chat():
                     response = chat.invoke(inputs, config=RunnableConfig(callbacks=[stream_handler]))
                 # response = st.write_stream(chat.stream(inputs, config=RunnableConfig(callbacks=[stream_handler])))
                 st.session_state['chat_response'] = response
-                final_response = response['answer']
+                final_response = response['answer'].content
                 
                 if "docs" in response and \
                     len(response["docs"]) > 0:
@@ -59,9 +63,10 @@ def hashi_chat():
                     final_response += ("\n*No source documents found. The information provided by the AI is probably incorrect!*")
                     st.warning("*No source documents found. The information provided by the AI is probably incorrect!*")
 
-                memory.save_context(inputs, {"answer":final_response})
+                memory.save_context(inputs, {"answer": final_response})
+                # memory.save_context(inputs, {"answer":final_response})
                 st.session_state.messages.append({"role": "assistant", "content": final_response})
-                st.write(final_response)
+                st.write(str(final_response))
                 
             except Exception as ex:
                 if 'chat_response' in st.session_state:
