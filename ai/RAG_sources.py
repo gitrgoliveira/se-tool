@@ -70,6 +70,12 @@ website_urls = [
         "prevent_outside": True
     },
     {
+        "name": "hashicorp_waf",
+        "url": "https://developer.hashicorp.com/well-architected-framework",
+        "depth": 5,
+        "prevent_outside": True
+    },
+    {
         "name": "hashicorp_blog",
         "url": "https://www.hashicorp.com/blog",
         "depth": 5,
@@ -128,7 +134,7 @@ website_urls = [
 # List of repositories and their corresponding documentation folders
 repos_and_folders = [
     {"repo_url": "https://github.com/hashicorp/boundary.git", "docs_folder": "website/content"},
-    {"repo_url": "https://github.com/hashicorp/consul.git", "docs_folder": "docs"},
+    {"repo_url": "https://github.com/hashicorp/consul.git", "docs_folder": "website/content"},
     {"repo_url": "https://github.com/hashicorp/nomad.git", "docs_folder": "website/content"},
     {"repo_url": "https://github.com/hashicorp/packer.git", "docs_folder": "website/content"},
     {"repo_url": "https://github.com/hashicorp/terraform.git", "docs_folder": "website/docs"},
