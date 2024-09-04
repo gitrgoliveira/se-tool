@@ -17,7 +17,7 @@ from langchain_community.document_transformers.html2text import (
     Html2TextTransformer)
 from langchain_community.embeddings.huggingface import (  # HuggingFaceEmbeddings,
     HuggingFaceBgeEmbeddings, HuggingFaceInstructEmbeddings)
-from langchain_community.vectorstores.chroma import Chroma
+from langchain_chroma import Chroma
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_text_splitters import (MarkdownTextSplitter, NLTKTextSplitter,
                                       SentenceTransformersTokenTextSplitter)
@@ -165,13 +165,14 @@ def get_embedding():
     elif sys.platform == "darwin":
         model_kwargs = {'device':'mps'}
         
-    encode_kwargs = {'normalize_embeddings': False, 'show_progress_bar': True}
+    encode_kwargs = {'normalize_embeddings': False}
     cache_folder="./cache"
     os.makedirs(cache_folder, exist_ok=True)
     return HuggingFaceBgeEmbeddings(cache_folder=cache_folder,
                                     model_name=model_name,
                                     model_kwargs=model_kwargs,
                                     encode_kwargs = encode_kwargs,
+                                    show_progress = True
     ) 
 
 def get_embedding_mistral():
@@ -182,7 +183,7 @@ def get_embedding_mistral():
     elif sys.platform == "darwin":
         model_kwargs = {'device':'mps'}
 
-    encode_kwargs = {'normalize_embeddings': False, 'show_progress_bar': True}
+    encode_kwargs = {'normalize_embeddings': False}
     # model_name = "intfloat/e5-mistral-7b-instruct",
     # tokens_per_chunk = 4096                     
     # For when there's enough memory to run mistral embeddings
@@ -192,7 +193,8 @@ def get_embedding_mistral():
     return HuggingFaceInstructEmbeddings(cache_folder=cache_folder,
                                         model_name="intfloat/e5-mistral-7b-instruct",
                                         model_kwargs=model_kwargs,
-                                        encode_kwargs = encode_kwargs
+                                        encode_kwargs = encode_kwargs,
+                                        show_progress = True
     )
 
 def create_embeddings(name, documents, output_path):
