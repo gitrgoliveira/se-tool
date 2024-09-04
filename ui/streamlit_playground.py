@@ -1,8 +1,7 @@
 
-import ai.hashi_prompts as hashi_prompts
 import streamlit as st
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableConfig
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
@@ -45,10 +44,12 @@ def add_playground():
             if language_model is None:
                 st.error("No language model loaded. Please select a model from the sidebar.")
                 return
-            prompt_template = hashi_prompts.prompt_from_model(model_name=st.session_state['llm_model'])
-
-            prompt = PromptTemplate.from_template(prompt_template.format(
-            system=system, prompt=input))
+            
+            prompt = ChatPromptTemplate.from_messages(
+                [
+                    ("system", system ),
+                    ("user", input)
+                ])
             chain = prompt | language_model | StrOutputParser()
             
             result = chain.invoke({}, config=RunnableConfig(callbacks=[stream_handler]))
