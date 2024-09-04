@@ -4,7 +4,7 @@ import logging
 from operator import itemgetter
 
 from langchain.memory import ConversationSummaryMemory
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import ChatOllama
 from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate, format_document
@@ -18,20 +18,19 @@ def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_s
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)
 
-def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
+def retrieval_qa_chain(llm: ChatOllama, retriever: BaseRetriever| None, memory: ConversationSummaryMemory):
     from langchain.chains.conversational_retrieval.prompts import (
         CONDENSE_QUESTION_PROMPT)
     from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
-    
-    base_template = hashi_prompts.prompt_from_model(llm.model).format(
-        system=("All questions are in the context of HashiCorp products. Given the following conversation and a follow up question, rephrase ",
-                "the follow up question to be a standalone question, in its original language, tone and with corrected grammar and spelling."),
-        prompt=("Chat History: \n",
-                "{chat_history}",
-                "\nFollow Up Input: {question} \n",
-                "Standalone question:")
-    )
+    # base_template = hashi_prompts.prompt_from_model(llm.model).format(
+    #     system=("All questions are in the context of HashiCorp products. Given the following conversation and a follow up question, rephrase ",
+    #             "the follow up question to be a standalone question, in its original language, tone and with corrected grammar and spelling."),
+    #     prompt=("Chat History: \n",
+    #             "{chat_history}",
+    #             "\nFollow Up Input: {question} \n",
+    #             "Standalone question:")
+    # )
     # CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(template=base_template)
     
     loaded_memory = RunnablePassthrough.assign(
@@ -79,7 +78,9 @@ def retrieval_qa_chain(llm: Ollama, retriever: BaseRetriever| None, memory):
     # The part that returns the answers
     
     answer = {
-        "answer": final_inputs | hashi_prompts.QA_prompt(llm.model) | llm,
+        # "standalone_question": lambda x: x["standalone_question"],
+        "standalone_question": itemgetter("standalone_question"),
+        "answer": final_inputs | hashi_prompts.QA_prompt() | llm,
         "docs": itemgetter("docs"),
     }
     
@@ -98,7 +99,9 @@ def get_hashi_chat(llm=None, callback_manager=None, extra_retriever: BaseRetriev
         loaded_llm=llm
         
     memory = ConversationSummaryMemory(
-        llm=loaded_llm, memory_key="chat_history", return_messages=True
+        llm=loaded_llm, memory_key="chat_history", return_messages=True,
+        input_key="question",
+        output_key="answer"
         )
     retriever = get_retriever(loaded_llm, use_filters=True, extra_retriever=extra_retriever)
     

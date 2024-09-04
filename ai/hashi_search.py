@@ -3,9 +3,9 @@
 import logging
 from operator import itemgetter
 
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import PromptTemplate, format_document
+from langchain_core.prompts import PromptTemplate, format_document, ChatPromptTemplate
 from langchain_core.retrievers import BaseRetriever
 
 import ai.hashi_prompts as hashi_prompts
@@ -20,27 +20,32 @@ def simple_search(retrievers, query):
     return ensemble_retriever.get_relevant_documents(query)
 
 
-def retrieval_search_chain(llm: Ollama, retriever):
+def retrieval_search_chain(llm: ChatOllama, retriever):
     
-    from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+    from langchain_core.runnables import RunnablePassthrough
     
-    base_template = hashi_prompts.prompt_from_model(llm.model).format(
-        system=("All questions are in the context of HashiCorp products.Given the following question, rephrase it as a standalone question, in its original language \n"),
-        prompt=("Question: {question} \n",
-                "Standalone question:")
+    pass_through = RunnablePassthrough() 
+   
+    CONDENSE_QUESTION_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "All questions are in the context of HashiCorp products.Given the following question, rephrase it as a standalone question, in its original language \n",
+            ),
+            (
+                "user",
+                "Question: {question} \n Standalone question:"
+            ),
+        ]   
     )
     
-    pass_through = RunnablePassthrough()
-    
-    
-    CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(template=base_template)
     standalone_question = {
-    "standalone_question": {
-        "question": lambda x: x["question"]
-    }
-    | CONDENSE_QUESTION_PROMPT
-    | llm     
-    | StrOutputParser(),
+        "standalone_question": {
+            "question": lambda x: x["question"]
+        }
+        | CONDENSE_QUESTION_PROMPT
+        | llm
+        | StrOutputParser(),
     }
     # | get_hf_llm()
     
@@ -70,9 +75,10 @@ def retrieval_search_chain(llm: Ollama, retriever):
         }
     
     # The part that returns the answers
+    SEARCH_PROMPT=hashi_prompts.search_prompt()
     
     answer = {
-        "answer": final_inputs | hashi_prompts.search_prompt(llm.model) | llm,
+        "answer": final_inputs | SEARCH_PROMPT | llm,
         "docs": itemgetter("docs"),
     }
     
