@@ -82,15 +82,14 @@ def hashi_chat():
                 len(chat_response["docs"]) > 0:
                 st.sidebar.markdown("### Search details")
                 with st.spinner("Compiling sources..."):                    
-                    for doc in chat_response["docs"]:
+                    sorted_docs = sorted(chat_response["docs"], key=lambda doc: doc.metadata['relevance_score'], reverse=True)
+                    for doc in sorted_docs:
                         with st.sidebar.container(border=True):
-                            # st.sidebar.info(doc.state['query_similarity_score'])
                             st.sidebar.info(doc.metadata['relevance_score'])
                             st.sidebar.write(doc.page_content)
                             if doc.metadata.get('text_as_html', False):
                                 del doc.metadata['text_as_html']
                             st.sidebar.json(doc.metadata)
-                            
             else:
                 st.warning("*No source documents found. The information provided by the AI is probably incorrect!*")
                 st.json(chat_response)

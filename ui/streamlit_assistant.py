@@ -65,8 +65,9 @@ def hashi_assistant():
                 if "docs" in result and \
                     len(result["docs"]) > 0:
                     st.sidebar.markdown("### Search details")
-                    with st.spinner("Compiling sources..."):                    
-                        for doc in result["docs"]:
+                    with st.spinner("Compiling sources..."):
+                        sorted_docs = sorted(result["docs"], key=lambda doc: doc.metadata['relevance_score'], reverse=True)
+                        for doc in sorted_docs:
                             with st.sidebar.container(border=True):
                                 # st.sidebar.info(doc.state['query_similarity_score'])
                                 st.sidebar.info(f"Score: {doc.metadata['relevance_score']}")
