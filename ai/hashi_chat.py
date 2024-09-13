@@ -78,8 +78,7 @@ def retrieval_qa_chain(llm: ChatOllama, retriever: BaseRetriever| None, memory: 
     # The part that returns the answers
     
     answer = {
-        # "standalone_question": lambda x: x["standalone_question"],
-        "standalone_question": itemgetter("standalone_question"),
+        "question": itemgetter("question"),
         "answer": final_inputs | hashi_prompts.QA_prompt() | llm,
         "docs": itemgetter("docs"),
     }
