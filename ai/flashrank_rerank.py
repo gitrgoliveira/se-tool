@@ -4,10 +4,9 @@ import logging
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
 from langchain.callbacks.manager import Callbacks
-from langchain.retrievers.document_compressors.base import (
-    BaseDocumentCompressor)
+from langchain_core.documents import BaseDocumentCompressor
 from langchain_core.documents import Document
-from langchain_core.pydantic_v1 import Extra, root_validator
+from pydantic import model_validator
 
 if TYPE_CHECKING:
     from flashrank import Ranker, RerankRequest
@@ -36,11 +35,9 @@ class FlashrankRerank(BaseDocumentCompressor):
 
     class Config:
         """Configuration for this pydantic object."""
-
-        extra = Extra.forbid
         arbitrary_types_allowed = True
 
-    @root_validator(pre=True, allow_reuse=True)
+    @model_validator(mode="before")
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and python package exists in environment."""
         try:
@@ -64,11 +61,11 @@ class FlashrankRerank(BaseDocumentCompressor):
         query: str,
         callbacks: Optional[Callbacks] = None,
     ) -> Sequence[Document]:
-        
+
         if len(documents) == 0:
             logging.debug("FlashRank: No documents to rerank")
             return documents
-        
+
         passages = [
             {
                 "id": i,
@@ -85,5 +82,5 @@ class FlashrankRerank(BaseDocumentCompressor):
                 metadata= {**dict(r["metadata"]), "id": r["id"], "relevance_score": r["score"]},
             ) for r in rerank_response
         ]
-        
+
         return final_results
