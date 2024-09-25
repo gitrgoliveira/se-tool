@@ -24,7 +24,7 @@ def hashi_writer ():
             "01 - Convert text to Feature Request format",
             "02 - Simplify the text language",
             "03 - Improve how this text is written",
-            "04 - Make the text more clear, concise and engaging. If possible, keep the same structure.",
+            "04 - Make the text more clear, concise and engaging. If possible, keep the same structure and tone.",
             "05 - Extract action points",
             "06 - Summarize this text",
             "07 - Generate a title",

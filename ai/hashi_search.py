@@ -3,10 +3,11 @@
 import logging
 from operator import itemgetter
 
-from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import PromptTemplate, format_document, ChatPromptTemplate
+from langchain_core.prompts import (ChatPromptTemplate, PromptTemplate,
+                                    format_document)
 from langchain_core.retrievers import BaseRetriever
+from langchain_ollama import ChatOllama
 
 import ai.hashi_prompts as hashi_prompts
 from ai.common import get_retriever, load_llm

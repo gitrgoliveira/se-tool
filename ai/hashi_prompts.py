@@ -1,5 +1,7 @@
 import logging
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
+
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+
 
 def QA_prompt() -> ChatPromptTemplate:
     messages = [

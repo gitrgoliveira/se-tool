@@ -2,13 +2,14 @@
 
 import logging
 from operator import itemgetter
+from typing import Optional
 
 from langchain.memory import ConversationSummaryMemory
-from langchain_ollama import ChatOllama
 from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate, format_document
 from langchain_core.retrievers import BaseRetriever
+from langchain_ollama import ChatOllama
 
 import ai.hashi_prompts as hashi_prompts
 from ai.common import get_retriever, load_llm
@@ -89,7 +90,7 @@ def retrieval_qa_chain(llm: ChatOllama, retriever: BaseRetriever| None, memory: 
     return final_chain
 
 
-def get_hashi_chat(llm=None, callback_manager=None, extra_retriever: BaseRetriever = None):
+def get_hashi_chat(llm=None, callback_manager=None, extra_retriever: Optional[BaseRetriever] = None):
     if llm == None:
         logging.debug("Loading a new LLM")
         loaded_llm = load_llm(callback_manager=callback_manager)
