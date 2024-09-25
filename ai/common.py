@@ -7,16 +7,17 @@ from urllib.parse import urlparse
 import ollama
 from flashrank import Ranker
 from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors import (
-    DocumentCompressorPipeline, EmbeddingsFilter)
+from langchain.retrievers.document_compressors.base import (
+    DocumentCompressorPipeline)
+from langchain.retrievers.document_compressors.embeddings_filter import (
+    EmbeddingsFilter)
 from langchain.retrievers.merger_retriever import MergerRetriever
+from langchain_chroma import Chroma
 from langchain_community.document_transformers.embeddings_redundant_filter import (
     EmbeddingsRedundantFilter)
 from langchain_community.document_transformers.long_context_reorder import (
     LongContextReorder)
-from langchain_ollama import ChatOllama, OllamaEmbeddings 
 from langchain_community.retrievers.bm25 import BM25Retriever
-from langchain_chroma import Chroma
 from langchain_core.callbacks.manager import CallbackManager
 from langchain_core.callbacks.stdout import StdOutCallbackHandler
 from langchain_core.callbacks.streaming_stdout import (
@@ -24,6 +25,7 @@ from langchain_core.callbacks.streaming_stdout import (
 from langchain_core.documents.base import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.vectorstores import VectorStore
+from langchain_ollama import ChatOllama, OllamaEmbeddings
 from tqdm import tqdm
 
 from ai.embed_hashicorp import get_embedding, output_ai, repo_name, split_text
@@ -95,12 +97,18 @@ class ModelDownloader:
     def list(cls) -> Mapping[str, Any]:
         return cls.cli.list()
     
+    @classmethod
     def get_ctx_from_llm(cls, llm_model: str) -> int:
         try:
             model_info = cls.cli.show(llm_model).get('model_info')
-            for k in model_info:
-                if k.endswith("context_length"):
-                    return int(model_info[k])
+            if model_info is not None:
+                for k in model_info:
+                    if k.endswith("context_length"):
+                        return int(model_info[k])
+                return 2048
+            else:
+                logging.error(f"Model info not found for {llm_model}")
+                return 2048
         except Exception as e:
             logging.error(f"Error when getting context size for {llm_model}: {e}")
             return 2048
@@ -135,7 +143,7 @@ def load_llm(llm_model: str = default_llm_model,
     md.download_model(llm_model)
     
     return ChatOllama(
-        base_url=ollama_host,
+        # base_url=ollama_host,
         model=llm_model,
         mirostat=2,
         # num_gpu=GPU_THREADS,
@@ -161,10 +169,10 @@ def get_retriever_svm (documents, embeding_function):
 
 def get_retriever_parent (documents, embeding_function):
     from langchain.retrievers import ParentDocumentRetriever
-    from langchain_community.vectorstores import InMemoryVectorStore
-
     from langchain.storage import InMemoryStore
     from langchain_community.document_loaders import TextLoader
+    from langchain_community.vectorstores import InMemoryVectorStore
+    from langchain.retrievers.multi_vector import SearchType
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
     child_splitter = RecursiveCharacterTextSplitter(chunk_size=512)
@@ -179,8 +187,9 @@ def get_retriever_parent (documents, embeding_function):
         parent_splitter=parent_splitter,
         search_kwargs={
             "k": 5,
+            "score_threshold": 0.65
             },
-        search_type="similarity",
+        search_type=SearchType.similarity_score_threshold,
     )
     
     retriever.add_documents(documents)
@@ -210,7 +219,8 @@ def get_vectorstore_chroma(persist_directory, embedding_function):
     # from chromadb.config import Settings
     # client_settings = Settings()
     vectorstore = Chroma(persist_directory=persist_directory, embedding_function=embedding_function)
-    vectorstore._client_settings.anonymized_telemetry = False
+    if vectorstore._client_settings:
+        vectorstore._client_settings.anonymized_telemetry = False
     # vectorstore._client_settings.chroma_product_telemetry_impl = ""
     # vectorstore._client_settings.chroma_telemetry_impl = ""
     return vectorstore
@@ -315,7 +325,7 @@ def get_hf_llm():
     return hf
 
 
-def get_retriever(llm, use_filters=False, multi_query=False, extra_retriever: BaseRetriever = None) -> BaseRetriever | None:
+def get_retriever(llm, use_filters=False, multi_query=False, extra_retriever: Optional[BaseRetriever] = None) -> Optional[BaseRetriever]:
     embedding_function = get_embedding()
     # filter_embedding = get_filter_embedding()
     chroma_retrievers = []
@@ -342,7 +352,7 @@ def get_retriever(llm, use_filters=False, multi_query=False, extra_retriever: Ba
         
     return retriever
 
-def load_extra_retriever() -> BaseRetriever:
+def load_extra_retriever() -> BaseRetriever | None:
     embedding_function = get_embedding()
     documents = load_extra_files(extra_files)
     if documents == []:
