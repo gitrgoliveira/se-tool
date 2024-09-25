@@ -382,6 +382,9 @@ def load_extra_files(path):
             extra_documents.extend(load_pptx(os.path.join(path, file)))
         elif file.endswith(".csv"):
             extra_documents.extend(load_csv(os.path.join(path, file)))
+        elif file.endswith(".md") or file.endswith(".mdx"):
+            if file != "INSTRUCTIONS.md":
+                extra_documents.extend(load_md(os.path.join(path, file)))
         
             
     return extra_documents
@@ -430,6 +433,15 @@ def load_csv(path) -> List[Document]:
     try:
         from langchain_community.document_loaders.csv_loader import CSVLoader
         loader = CSVLoader(file_path=path, autodetect_encoding=True)
+        return loader.load()
+    except Exception as e:
+        logging.error(f"Error loading {path}: {e}")
+    return []
+
+def load_md(path) -> List[Document]:
+    try:
+        from langchain_community.document_loaders.markdown import UnstructuredMarkdownLoader
+        loader = UnstructuredMarkdownLoader(file_path=path, mode="elements", autodetect_encoding=True)
         return loader.load()
     except Exception as e:
         logging.error(f"Error loading {path}: {e}")
