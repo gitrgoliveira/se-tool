@@ -5,20 +5,20 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from logging import debug, error, info, warning
+from typing import List
 
 import torch
 from dateutil.relativedelta import relativedelta
-# from bs4 import BeautifulSoup
-# from langchain.document_loaders.recursive_url_loader import RecursiveUrlLoader
 from langchain.indexes import SQLRecordManager, index
-from langchain_community.document_loaders.directory import (DirectoryLoader,
-                                                            TextLoader)
+from langchain_chroma import Chroma
+from langchain_community.document_loaders.directory import DirectoryLoader
+from langchain_community.document_loaders.text import TextLoader
 from langchain_community.document_transformers.html2text import (
     Html2TextTransformer)
 from langchain_community.embeddings.huggingface import (  # HuggingFaceEmbeddings,
     HuggingFaceBgeEmbeddings, HuggingFaceInstructEmbeddings)
-from langchain_chroma import Chroma
 from langchain_community.vectorstores.utils import filter_complex_metadata
+from langchain_core.documents.base import Document
 from langchain_text_splitters import (MarkdownTextSplitter, NLTKTextSplitter,
                                       SentenceTransformersTokenTextSplitter)
 
@@ -89,38 +89,58 @@ def splitter_md (chunks):
     
     return split_text(chunks)
 
-def split_text(chunks):
-    # from langchain.text_splitter import RecursiveCharacterTextSplitter
-    # text_splitter = RecursiveCharacterTextSplitter(
-    #     chunk_size=2048,
-    #     chunk_overlap=512,
-    #     length_function=len,
-    # )
-    info(f"Splitting text into chunks of {tokens_per_chunk} tokens")
+def split_text(chunks) -> List[Document]:
+    
+    debug("Filtering...")
+    chunks = filter_complex_metadata(chunks)
+    info(f"Filtered into {len(chunks)} chunks")
+    print(f"Filtered into {len(chunks)} chunks")
+    
+    chunks = nltk_splitter(chunks)
+    chunks = stt_splitter(chunks)
+    # chunks = semantic_splitter(chunks)
+    
+    return chunks
+
+def nltk_splitter(chunks) -> List[Document]:    
     nltk_splitter = NLTKTextSplitter(add_start_index=True)
+    chunks = nltk_splitter.split_documents(chunks)
+    info(f"Split into {len(chunks)} chunks, using NLTK Text Splitter")
+    
+    return chunks
+
+# this is currently very slow to run locally!
+def semantic_splitter(chunks) -> List[Document]:
+    from langchain_experimental.text_splitter import SemanticChunker
+    hf_embeddings = get_embedding()
+    semantic_chunker = SemanticChunker(
+                                    embeddings=hf_embeddings,
+                                    add_start_index=True,
+                                    breakpoint_threshold_type="gradient",   
+                                    )
+    
+    chunks = semantic_chunker.split_documents(chunks)
+    info(f"Split into {len(chunks)} chunks, using the Semantic Chunker")
+    
+    return chunks
+    
+    
+def stt_splitter(chunks) -> List[Document]:
+    info(f"Splitting text into chunks of {tokens_per_chunk} tokens")
+    
     stt_splitter = SentenceTransformersTokenTextSplitter(
         model_name = model_name, 
-        # model_name = "BAAI/bge-large-en-v1.5", 
-        # tokens_per_chunk = tokens_per_chunk,
-        # tokens_per_chunk = 512,
+        tokens_per_chunk = tokens_per_chunk,
         add_start_index=True,
         keep_separator = True
         )
     stt_splitter._add_start_index = True
     
-    debug("Filtering...")
-    # chunks = text_splitter.split_documents(chunks)
-    chunks = filter_complex_metadata(chunks)
-    info(f"Filtered into {len(chunks)} chunks")
-    
-    chunks = nltk_splitter.split_documents(chunks)
-    info(f"Split into {len(chunks)} chunks, using NLTK Splitter")
-    
     chunks = stt_splitter.split_documents(chunks)
     info(f"Split into {len(chunks)} chunks, using Sentence Transformers Token Text Splitter")
-     
-    return chunks
     
+    return chunks
+
 def load_documents_git(repo_path, repo_url=None):
     info(f"Loading data from {repo_path}...")
 
@@ -251,25 +271,7 @@ def recursive_website_loader(url: dict):
     info(f"Loading data from {url}")
 
     html2text = Html2TextTransformer(ignore_images=False, ignore_links=False)
-    
-    # def extractor(html):
-    #     soup = BeautifulSoup(html, 'html.parser')
-    #     text = soup.get_text()
-    #     text = text.replace('\ufeff', ' ').replace('\u200b', ' ').replace('\u200c', ' ').replace('\u200d', ' ')
-    #     return text
 
-    # from langchain_community.document_loaders import RecursiveUrlLoader
-    # loader = RecursiveUrlLoader(
-    #     url=url,
-    #     max_depth=10,
-    #     use_async=True,
-    #     timeout=None,        
-    #     prevent_outside=True,
-    #     check_response_status=False,
-    #     extractor=extractor
-    #     )
-
-    # docs = loader.load()
     from ai.web_scraper import Scraper
     docs = Scraper(base_url=url['url'], 
                    max_depth=url['depth'], 
