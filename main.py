@@ -49,13 +49,14 @@ def main():
     with playground:
         add_playground()
 
+@st.fragment()
 def settings():
-    st.sidebar.title("Ollama Settings")
+    st.title("Ollama Settings")
     default_host = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
     ollama_host = st.text_input("OLLAMA_HOST", key="OLLAMA_HOST", value=default_host, placeholder="OLLAMA_HOST", label_visibility="collapsed")
     ollama_host = check_ollama_host (ollama_host=ollama_host)
         
-    col1, col2 = st.sidebar.columns([3,1])
+    col1, col2 = st.columns([3,1])
     with col1:
         pull_model = st.text_input("Pull model", placeholder="model to pull", label_visibility="collapsed")
     with col2:
@@ -69,7 +70,7 @@ def settings():
             st.error(f"{ex}")
         
     if get_model_list(ollama_host=ollama_host) == []:
-        st.sidebar.error("No models found. Please run `ollama pull` to download models from https://ollama.ai/library")
+        st.error("No models found. Please run `ollama pull` to download models from https://ollama.ai/library")
         
     model_list = get_model_list(ollama_host=ollama_host)
     index = 0
@@ -81,10 +82,10 @@ def settings():
                                      label_visibility="collapsed",
                                      index=index)
 
-    temperature = st.sidebar.slider("Less or more creative?", min_value=0.0, max_value=1.0, value=0.1, step=.1)
+    temperature = st.slider("Less or more creative?", min_value=0.0, max_value=1.0, value=0.1, step=.1)
     load_llm_button = st.button("Load model", use_container_width=True, type="primary")
     reload_extra_docs_disabled = False
-    if st.session_state.get('extra_retriever', None) == None or load_llm_button:
+    if st.session_state.get('llm', None) == None or load_llm_button:
         reload_extra_docs_disabled = True
     reload_extra_docs = st.button("Reload extra docs", use_container_width=True, type="secondary", disabled=reload_extra_docs_disabled)    
     
@@ -117,11 +118,12 @@ def settings():
             st.session_state['chat'] = get_hashi_chat(llm=st.session_state['llm'],
                                                       extra_retriever=st.session_state['extra_retriever'])
             st.toast(f"Loaded {st.session_state.get('llm_model')} with {temperature}")
+            st.rerun(scope="fragment")
 
     if st.session_state.get('llm', None) == None:
-        st.sidebar.error("No models loaded. Please select and load a model.")
+        st.error("No models loaded. Please select and load a model.")
     else:
-        st.sidebar.info(f"Current model {st.session_state.get('llm_model')} with {temperature}")
+        st.info(f"Current model {st.session_state.get('llm_model')} with {temperature}")
 
 
 if __name__ == "__main__":
