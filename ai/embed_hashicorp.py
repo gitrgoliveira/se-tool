@@ -4,7 +4,7 @@ import datetime
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from logging import debug, error, info, warning
+from logging import debug, error, info
 from typing import List
 
 import torch
@@ -40,7 +40,6 @@ tokens_per_chunk = 512
 # For when there's enough memory to run mistral embeddings
 # model_name = "intfloat/e5-mistral-7b-instruct"
 # tokens_per_chunk = 4096
-
 
 def repo_name(repo_url):
     repo_name = repo_owner_and_name(repo_url)
@@ -94,11 +93,10 @@ def split_text(chunks) -> List[Document]:
     debug("Filtering...")
     chunks = filter_complex_metadata(chunks)
     info(f"Filtered into {len(chunks)} chunks")
-    print(f"Filtered into {len(chunks)} chunks")
     
     chunks = nltk_splitter(chunks)
+    # chunks = semantic_splitter(chunks) # this is currently very slow to run locally!
     chunks = stt_splitter(chunks)
-    # chunks = semantic_splitter(chunks)
     
     return chunks
 
@@ -144,17 +142,7 @@ def stt_splitter(chunks) -> List[Document]:
 def load_documents_git(repo_path, repo_url=None):
     info(f"Loading data from {repo_path}...")
 
-    from langchain_community.document_loaders import (GitHubIssuesLoader,
-                                                      GitLoader)
-
-    # git_loader = GitLoader(
-    #         clone_url=repo_url,
-    #         repo_path=repo_path,
-    #         file_filter=lambda file_path: file_path.endswith(".mdx") or file_path.endswith(".mdx"),
-    #         )
-    # chunks = git_loader.load()
-    # info(f"Loaded {len(chunks)} documents")
-    # chunks = splitter_md (chunks)
+    from langchain_community.document_loaders import GitHubIssuesLoader
     chunks = []
     
     # load only issues from the 3 years
@@ -169,6 +157,9 @@ def load_documents_git(repo_path, repo_url=None):
         more_chunks = github_loader.load()
         info(f"Loaded {len(more_chunks)} issues")
         more_chunks = splitter_md (more_chunks)
+        # from langchain_community.document_transformers.doctran_text_qa import DoctranQATransformer
+        # qa_docs = DoctranQATransformer().transform_documents(more_chunks)
+        # chunks.extend(qa_docs)
         chunks.extend(more_chunks)
         
     except Exception as e:
@@ -258,14 +249,6 @@ def add_repo_metadata(docs, repo_url):
             
     return docs
 
-# from langchain_community.retrievers.embedchain import EmbedchainRetriever
-# https://docs.embedchain.ai/components/embedding-models#hugging-face
-# https://python.langchain.com/docs/integrations/retrievers/embedchain
-# https://docs.embedchain.ai/components/vector-databases#chromadb
-# https://docs.embedchain.ai/components/data-sources/github
-# https://docs.embedchain.ai/components/data-sources/web-page
-# https://docs.embedchain.ai/components/data-sources/docs-site
-
 def recursive_website_loader(url: dict):
     print(f"Loading data from {url}")
     info(f"Loading data from {url}")
@@ -298,7 +281,7 @@ def create_git_embeddings(base_path: str, only_missing_embeddings: bool):
         name = repo_name(repo_info["repo_url"])
         repo_path = os.path.join(output_repos, name)
         output_path = os.path.join(base_path, name)
-        if only_missing_embeddings and os.path.exists(output_path):
+        if only_missing_embeddings and os.path.exists(os.path.join(output_path, "results.done")):
             continue
         future = load_processor.submit_job(load_documents_git, repo_path, repo_info["repo_url"])
         jobs.append((repo_info["repo_url"], output_path, future))
@@ -308,6 +291,8 @@ def create_git_embeddings(base_path: str, only_missing_embeddings: bool):
         name = repo_name(repo_url)
         github_docs = future.result()
         info(f"Loaded {len(github_docs)} documents from {name}")
+        if len(github_docs) == 0:
+            continue
         docs = add_repo_metadata(github_docs, repo_url)
         os.makedirs(output_path, exist_ok=True)
         embedding_processor.submit_job(create_embeddings, name, docs, output_path)
@@ -318,7 +303,7 @@ def create_website_embeddings(base_path: str, only_missing_embeddings: bool):
     jobs = []
     for website_url in website_urls:
         output_path = os.path.join(base_path, website_url['name'])
-        if only_missing_embeddings and os.path.exists(output_path):
+        if only_missing_embeddings and os.path.exists(os.path.join(output_path, "results.done")):
             continue
         future = load_processor.submit_job(recursive_website_loader, website_url)
         jobs.append((website_url['name'], output_path, future))
@@ -327,6 +312,8 @@ def create_website_embeddings(base_path: str, only_missing_embeddings: bool):
     for name, output_path, future in jobs:
         website_docs = future.result()
         info(f"Loaded {len(website_docs)} documents from {name}")
+        if len(website_docs) == 0:
+            continue
         embedding_processor.submit_job(web_split_and_embed, name, output_path, website_docs)
         
 
