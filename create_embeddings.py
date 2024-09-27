@@ -11,7 +11,8 @@ def main(base_path: str, only_missing_embeddings: bool):
     """
     Main function to create embeddings and save them to the specified base path.
     """
-    # logging.getLogger().setLevel(logging.DEBUG)
+    logging.getLogger().setLevel(logging.INFO)
+    logging.basicConfig(handlers=[logging.FileHandler(os.path.join(base_path, "create_embeddings.log"), 'w', 'utf-8')])
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     
     os.environ["TOKENIZERS_PARALLELISM"] = "false"

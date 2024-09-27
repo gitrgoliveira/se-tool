@@ -14,7 +14,7 @@ env
 venv
 embed
 archive
-
+.env
 # Temp files
 .chainlit
 .vscode
