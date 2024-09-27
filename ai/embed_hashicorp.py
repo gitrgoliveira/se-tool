@@ -3,7 +3,7 @@
 import datetime
 import os
 import sys
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, Future, as_completed
 from logging import debug, error, info
 from typing import List
 
@@ -297,9 +297,11 @@ def create_git_embeddings(base_path: str, only_missing_embeddings: bool):
         embedding_processor.submit_job(create_embeddings, name, docs, output_path)
     
 
+from typing import List, Dict, Tuple
 
 def create_website_embeddings(base_path: str, only_missing_embeddings: bool):
-    jobs = []
+    jobs: List[Tuple[str, str, Future]] = []
+    
     for website_url in website_urls:
         output_path = os.path.join(base_path, website_url['name'])
         if only_missing_embeddings and os.path.exists(os.path.join(output_path, "results.done")):
@@ -307,14 +309,19 @@ def create_website_embeddings(base_path: str, only_missing_embeddings: bool):
         future = load_processor.submit_job(recursive_website_loader, website_url)
         jobs.append((website_url['name'], output_path, future))
     
-    # Process the jobs and collect the results
-    for name, output_path, future in jobs:
-        website_docs = future.result()
-        info(f"Loaded {len(website_docs)} documents from {name}")
-        if len(website_docs) == 0:
-            continue
-        embedding_processor.submit_job(web_split_and_embed, name, output_path, website_docs)
-        
+    # as scrapping jobs complete, we need to start the embedding
+    for future in as_completed([job[2] for job in jobs]):
+        job = next(job for job in jobs if job[2] == future)
+        name, output_path, _ = job
+        try:
+            website_docs = future.result()
+            info(f"Loaded {len(website_docs)} documents from {name}")
+            if len(website_docs) == 0:
+                continue
+            embedding_processor.submit_job(web_split_and_embed, name, output_path, website_docs)
+        except Exception as e:
+            error(f"Error processing {name}: {e}")
+
 
 def web_split_and_embed(name, output_path, website_docs):
     website_docs = split_text(website_docs)
