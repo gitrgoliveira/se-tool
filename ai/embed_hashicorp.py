@@ -250,7 +250,6 @@ def add_repo_metadata(docs, repo_url):
     return docs
 
 def recursive_website_loader(url: dict):
-    print(f"Loading data from {url}")
     info(f"Loading data from {url}")
 
     html2text = Html2TextTransformer(ignore_images=False, ignore_links=False)
