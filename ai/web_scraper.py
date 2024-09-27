@@ -1,3 +1,4 @@
+import re
 import asyncio
 import logging
 from asyncio import Semaphore
@@ -128,7 +129,7 @@ class Scraper(BaseLoader):
                     self.logger.warning(f"Retrying {url}...")
                     continue
                 else: 
-                    self.logger.error(f"Timeout error while scraping {url}: {e}")
+                    self.logger.error(f"Giving up scraping {url}: {e}")
 
                 
                 self.visited[url] = False
@@ -139,7 +140,7 @@ class Scraper(BaseLoader):
                     self.logger.warning(f"Retrying {url}...")
                     continue
                 else:
-                    self.logger.error(f"An error {type(e).__name__} occurred while scraping {url}: {e}")
+                    self.logger.error(f"Giving up scraping. An error {type(e).__name__} occurred while scraping {url}: {e}")
                 
                 self.visited[url] = False
             finally:
@@ -158,11 +159,25 @@ class Scraper(BaseLoader):
     async def _scrape_all_sublinks(self, url, depth, documents, browser, content: str):
         links = extract_sub_links(raw_html=content, url=url, base_url=self.base_url, prevent_outside=self.prevent_outside)
         tasks = []
+        
+        # ----------------------------------------------
+        # preventing multiple similar versions of outdated docs from being loaded
+        version_pattern = re.compile(r'/v\d+\.\d+\.(\d+|x)/|/\d{6}-\d/')
+        tasks.extend(
+            self._scrape_documents(next_url, depth + 1, documents, browser)
+            for next_url in links
+            if (not self.prevent_outside or next_url.startswith(self.base_url)) 
+            and not version_pattern.search(next_url)
+            and next_url not in self.visited
+        )
+
         for next_url in links:
-            if self.prevent_outside and not next_url.startswith(self.base_url):
+            if self.prevent_outside \
+                and not next_url.startswith(self.base_url):
                 continue
             
-            if next_url not in self.visited:
+            if next_url not in self.visited \
+                and not version_pattern.search(next_url):
                 task = self._scrape_documents(next_url, depth + 1, documents, browser)
                 tasks.append(task)
                         
