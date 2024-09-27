@@ -11,7 +11,12 @@ pip install --upgrade pip
 pip install -r requirements.streamlit.txt
 playwright install
 ulimit -n 10240
-export ANONYMIZED_TELEMETRY=False
+
+if [ -f ".env" ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo ".env file not found."
+fi
 
 if [ -z "$GITHUB_PERSONAL_ACCESS_TOKEN" ]
 then
