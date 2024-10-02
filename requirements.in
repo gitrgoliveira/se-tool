@@ -6,6 +6,7 @@ langchain-community
 langchain-chroma
 langchain-ollama
 langchain-experimental
+markdown
 markdownify
 ollama
 openpyxl

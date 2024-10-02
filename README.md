@@ -48,6 +48,7 @@ You can drop multiple files into the `./docs` folder and the app will load and c
 - doc or docx
 - ppt or pptx
 - xls or xlsx
+- md or mdx
 
 ## Creating embeddings
 
