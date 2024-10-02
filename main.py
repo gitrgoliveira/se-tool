@@ -49,7 +49,7 @@ def main():
     with playground:
         add_playground()
 
-@st.fragment()
+# @st.fragment()
 def settings():
     st.title("Ollama Settings")
     default_host = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
@@ -118,7 +118,7 @@ def settings():
             st.session_state['chat'] = get_hashi_chat(llm=st.session_state['llm'],
                                                       extra_retriever=st.session_state['extra_retriever'])
             st.toast(f"Loaded {st.session_state.get('llm_model')} with {temperature}")
-            st.rerun(scope="fragment")
+            # st.rerun(scope="fragment")
 
     if st.session_state.get('llm', None) == None:
         st.error("No models loaded. Please select and load a model.")
