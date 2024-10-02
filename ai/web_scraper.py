@@ -79,6 +79,10 @@ class Scraper(BaseLoader):
                 self.logger.error(f"An error {type(e).__name__} occurred while scraping {url}: {e}")
                 
             return
+        # ignoring RSS files
+        if url.endswith('.rss'):
+            return
+
         retry_count = 0
         while retry_count < self.num_retries:
             try:
