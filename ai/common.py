@@ -73,12 +73,15 @@ class ModelDownloader:
                     if line:
                         # Parse the JSON string into a Python dictionary
                         line_dict: Dict[str, Any] = dict(line)
+                        
 
                         # Update the progress bar based on the 'completed' and 'total' fields
-                        if 'total' in line_dict and 'completed' in line_dict:
+                        if 'total' in line_dict and 'completed' in line_dict and \
+                            line_dict['total'] != None and line_dict['completed'] != None:
                             if pbar is None:
                                 # Create the progress bar
                                 pbar = tqdm(total=line_dict['total'], unit='B', unit_scale=True)
+                                
                             pbar.update(line_dict['completed'] - pbar.n)
 
                 if pbar is not None:
@@ -91,7 +94,7 @@ class ModelDownloader:
     @classmethod
     def model_exists(cls, llm_model: str) -> bool:
         models = cls.cli.list()
-        return any(model['name'] == llm_model for model in models['models'])
+        return any(model['model'] == llm_model for model in models['models'])
     
     @classmethod
     def list(cls) -> Mapping[str, Any]:
