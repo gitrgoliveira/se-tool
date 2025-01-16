@@ -74,5 +74,5 @@ def get_model_list() -> List[str]:
     except:
         st.error("Error loading Ollama model list")
         return []
-    return [model['name'] for model in models['models']]
+    return [model['model'] for model in models['models']]
   
