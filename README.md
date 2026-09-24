@@ -45,10 +45,12 @@ You can drop multiple files into the `./docs` folder and the app will load and c
 
 - csv
 - pdf
-- doc or docx
-- ppt or pptx
+- docx (doc needs [LibreOffice](https://www.libreoffice.org/) installed)
+- pptx (ppt needs [LibreOffice](https://www.libreoffice.org/) installed)
 - xls or xlsx
 - md or mdx
+
+LibreOffice is not included in the Docker image, so convert `.doc` and `.ppt` files to `.docx` and `.pptx` before using them there.
 
 ## Creating embeddings
 

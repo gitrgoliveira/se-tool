@@ -48,9 +48,8 @@ class FlashrankRerank(BaseDocumentCompressor):
 
         values["model"] = values.get("model", DEFAULT_MODEL_NAME)
         values["cache_dir"] = values.get("cache_dir", "/tmp")
-        values["client"] = values.get("client", 
-                                      Ranker(model_name=values["model"], cache_dir=values["cache_dir"])
-                                      )
+        if values.get("client") is None:
+            values["client"] = Ranker(model_name=values["model"], cache_dir=values["cache_dir"])
         return values
 
     def compress_documents(

@@ -64,6 +64,7 @@ chromadb==1.5.9
     #   langchain-chroma
 click==8.5.0
     # via
+    #   ddgs
     #   huggingface-hub
     #   nltk
     #   python-oxmsg
@@ -90,6 +91,8 @@ cymem==2.0.13
     #   preshed
     #   spacy
     #   thinc
+ddgs==9.16.0
+    # via -r requirements.in
 defusedxml==0.7.1
     # via nltk
 distro==1.9.0
@@ -98,6 +101,8 @@ durationpy==0.11
     # via kubernetes
 emoji==2.16.0
     # via unstructured
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+    # via -r requirements.in
 et-xmlfile==2.0.0
     # via openpyxl
 filelock==3.32.7
@@ -164,6 +169,7 @@ httpx2==2.13.1
     # via langsmith
 huggingface-hub==1.33.0
     # via
+    #   langchain-huggingface
     #   sentence-transformers
     #   tokenizers
     #   transformers
@@ -218,9 +224,12 @@ langchain-core==1.6.4
     #   langchain-classic
     #   langchain-community
     #   langchain-experimental
+    #   langchain-huggingface
     #   langchain-ollama
     #   langchain-text-splitters
 langchain-experimental==0.4.2
+    # via -r requirements.in
+langchain-huggingface==1.2.2
     # via -r requirements.in
 langchain-ollama==1.1.0
     # via -r requirements.in
@@ -239,6 +248,8 @@ llvmlite==0.49.0
     # via numba
 lxml==6.1.3
     # via
+    #   ddgs
+    #   python-docx
     #   python-pptx
     #   unstructured
 markdown==3.10.3
@@ -401,6 +412,8 @@ preshed==3.0.13
     # via
     #   spacy
     #   thinc
+primp==2.0.1
+    # via ddgs
 propcache==0.5.4
     # via
     #   aiohttp
@@ -453,6 +466,8 @@ python-dateutil==2.9.0.post0
     # via
     #   kubernetes
     #   pandas
+python-docx==1.2.0
+    # via -r requirements.in
 python-dotenv==1.2.3
     # via
     #   pydantic-settings
@@ -577,6 +592,7 @@ tokenizers==0.23.2
     # via
     #   chromadb
     #   flashrank
+    #   langchain-huggingface
     #   sentence-transformers
     #   transformers
 toml==0.10.2
@@ -631,6 +647,7 @@ typing-extensions==4.16.0
     #   pydantic
     #   pydantic-core
     #   pyee
+    #   python-docx
     #   python-oxmsg
     #   python-pptx
     #   referencing

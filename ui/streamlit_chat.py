@@ -5,10 +5,6 @@ from langchain_core.runnables import RunnableConfig
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from ui.streamlit_shared import StreamHandler, display_result
-from langchain_community.chat_message_histories import (
-    StreamlitChatMessageHistory,
-)
-from langchain_classic.memory import ConversationSummaryMemory
 
 
 def hashi_chat():

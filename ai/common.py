@@ -41,6 +41,10 @@ extra_files = "docs"
 CPU_THREADS = 16
 GPU_THREADS = 32
 DEFAULT_CACHE_DIR = "./cache"
+# context window used when the model does not report one
+DEFAULT_CTX = 2048
+# upper bound for the context window, as Ollama sizes its KV cache (memory) by num_ctx
+MAX_CTX = 8192
 
 class ModelDownloader:
     _instance = None
@@ -103,18 +107,18 @@ class ModelDownloader:
     @classmethod
     def get_ctx_from_llm(cls, llm_model: str) -> int:
         try:
-            model_info = cls.cli.show(llm_model).get('model_info')
+            model_info = cls.cli.show(llm_model).modelinfo
             if model_info is not None:
                 for k in model_info:
                     if k.endswith("context_length"):
-                        return int(model_info[k])
-                return 2048
+                        return min(int(model_info[k]), MAX_CTX)
+                return DEFAULT_CTX
             else:
                 logging.error(f"Model info not found for {llm_model}")
-                return 2048
+                return DEFAULT_CTX
         except Exception as e:
             logging.error(f"Error when getting context size for {llm_model}: {e}")
-            return 2048
+            return DEFAULT_CTX
  
  
  
@@ -174,7 +178,7 @@ def get_retriever_parent (documents, embeding_function):
     from langchain_classic.retrievers import ParentDocumentRetriever
     from langchain_classic.storage import InMemoryStore
     from langchain_community.document_loaders import TextLoader
-    from langchain_community.vectorstores import InMemoryVectorStore
+    from langchain_core.vectorstores import InMemoryVectorStore
     from langchain_classic.retrievers.multi_vector import SearchType
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -302,7 +306,7 @@ def get_filter_embedding():
     ModelDownloader(host=host).download_model(emebedding_model)    
     embedding = OllamaEmbeddings(
         base_url=host,
-        model = default_llm_model,
+        model = emebedding_model,
         num_gpu = GPU_THREADS,
         num_thread = CPU_THREADS,
         mirostat = 2,
@@ -314,7 +318,7 @@ def get_filter_embedding():
     return embedding
 
 def get_hf_llm():
-    from langchain_community.llms import HuggingFacePipeline
+    from langchain_huggingface import HuggingFacePipeline
     hf = HuggingFacePipeline.from_model_id(
         model_id="rishiraj/CatPPT-base",
         task="text-generation",
