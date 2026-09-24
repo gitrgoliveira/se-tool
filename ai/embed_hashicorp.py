@@ -2,23 +2,22 @@
 
 import datetime
 import os
-import sys
+import threading
 from concurrent.futures import ThreadPoolExecutor, Future, as_completed
-from logging import debug, error, info
+from logging import debug, error, info, warning
 from typing import List
 
 import torch
 from dateutil.relativedelta import relativedelta
-from langchain.indexes import SQLRecordManager, index
+from langchain_classic.indexes import SQLRecordManager, index
 from langchain_chroma import Chroma
 from langchain_community.document_loaders.directory import DirectoryLoader
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.document_transformers.html2text import (
     Html2TextTransformer)
-from langchain_community.embeddings.huggingface import (  # HuggingFaceEmbeddings,
-    HuggingFaceBgeEmbeddings, HuggingFaceInstructEmbeddings)
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.documents.base import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import (MarkdownTextSplitter, NLTKTextSplitter,
                                       SentenceTransformersTokenTextSplitter)
 
@@ -36,6 +35,8 @@ output_repos = "output_cloned_repos"
 # Massive Text Embedding Benchmark (MTEB) leaderboard: https://huggingface.co/spaces/mteb/leaderboard
 model_name = "BAAI/bge-large-en-v1.5"
 tokens_per_chunk = 512
+# BGE models expect this instruction in front of search queries, but not documents
+bge_query_instruction = "Represent this question for searching relevant passages: "
 
 # For when there's enough memory to run mistral embeddings
 # model_name = "intfloat/e5-mistral-7b-instruct"
@@ -100,7 +101,31 @@ def split_text(chunks) -> List[Document]:
     
     return chunks
 
+nltk_data_lock = threading.Lock()
+nltk_data_ready = False
+
+def ensure_nltk_data():
+    """NLTKTextSplitter needs the punkt_tab tokenizer data, which pip does not install."""
+    global nltk_data_ready
+    if nltk_data_ready:
+        return
+    import nltk
+    with nltk_data_lock:
+        if nltk_data_ready:
+            return
+        try:
+            nltk.data.find("tokenizers/punkt_tab")
+            nltk_data_ready = True
+        except LookupError:
+            info("Downloading NLTK punkt_tab tokenizer data")
+            if nltk.download("punkt_tab", quiet=True):
+                nltk_data_ready = True
+            else:
+                error("Could not download NLTK punkt_tab data. Run `python -m nltk.downloader punkt_tab`, "
+                      "or set NLTK_ALLOW_PROXIED_URLOPEN=1 when behind a proxy.")
+
 def nltk_splitter(chunks) -> List[Document]:    
+    ensure_nltk_data()
     nltk_splitter = NLTKTextSplitter(add_start_index=True)
     chunks = nltk_splitter.split_documents(chunks)
     info(f"Split into {len(chunks)} chunks, using NLTK Text Splitter")
@@ -168,44 +193,52 @@ def load_documents_git(repo_path, repo_url=None):
     return chunks
 
   
+def get_device() -> str:
+    if torch.cuda.is_available():
+        return 'cuda'
+    if torch.backends.mps.is_available():
+        return 'mps'
+    # an NVIDIA driver without a usable GPU usually means it is too old for this PyTorch build
+    if torch.version.cuda is not None and os.path.exists("/proc/driver/nvidia/version"):
+        warning(f"An NVIDIA driver is installed but PyTorch (CUDA {torch.version.cuda}) cannot use the GPU, "
+                "so embeddings run on the CPU. Check that the driver supports this CUDA version.")
+    return 'cpu'
+
 def get_embedding():
     
-    model_kwargs = {'device': 'cpu'}
-    if torch.cuda.is_available():
-        model_kwargs = {'device': 'cuda'}
-    elif sys.platform == "darwin":
-        model_kwargs = {'device':'mps'}
+    model_kwargs = {'device': get_device()}
         
     encode_kwargs = {'normalize_embeddings': False}
+    query_encode_kwargs = {**encode_kwargs, 'prompt': bge_query_instruction}
     cache_folder="./cache"
     os.makedirs(cache_folder, exist_ok=True)
-    return HuggingFaceBgeEmbeddings(cache_folder=cache_folder,
-                                    model_name=model_name,
-                                    model_kwargs=model_kwargs,
-                                    encode_kwargs = encode_kwargs,
-                                    show_progress = True
+    return HuggingFaceEmbeddings(cache_folder=cache_folder,
+                                 model_name=model_name,
+                                 model_kwargs=model_kwargs,
+                                 encode_kwargs = encode_kwargs,
+                                 query_encode_kwargs = query_encode_kwargs,
+                                 show_progress = True
     ) 
 
 def get_embedding_mistral():
     
-    model_kwargs = {'device': 'cpu'}
-    if torch.cuda.is_available():
-        model_kwargs = {'device': 'cuda'}
-    elif sys.platform == "darwin":
-        model_kwargs = {'device':'mps'}
+    model_kwargs = {'device': get_device()}
 
     encode_kwargs = {'normalize_embeddings': False}
+    # e5-mistral ships named prompts; queries use the web search one, documents none
+    query_encode_kwargs = {**encode_kwargs, 'prompt_name': 'web_search_query'}
     # model_name = "intfloat/e5-mistral-7b-instruct",
     # tokens_per_chunk = 4096                     
     # For when there's enough memory to run mistral embeddings
     cache_folder="./cache"
     os.makedirs(cache_folder, exist_ok=True)
 
-    return HuggingFaceInstructEmbeddings(cache_folder=cache_folder,
-                                        model_name="intfloat/e5-mistral-7b-instruct",
-                                        model_kwargs=model_kwargs,
-                                        encode_kwargs = encode_kwargs,
-                                        show_progress = True
+    return HuggingFaceEmbeddings(cache_folder=cache_folder,
+                                 model_name="intfloat/e5-mistral-7b-instruct",
+                                 model_kwargs=model_kwargs,
+                                 encode_kwargs = encode_kwargs,
+                                 query_encode_kwargs = query_encode_kwargs,
+                                 show_progress = True
     )
 
 def create_embeddings(name, documents, output_path):
@@ -254,6 +287,7 @@ def recursive_website_loader(url: dict):
 
     html2text = Html2TextTransformer(ignore_images=False, ignore_links=False)
 
+    ensure_nltk_data()
     from ai.web_scraper import Scraper
     docs = Scraper(base_url=url['url'], 
                    max_depth=url['depth'], 

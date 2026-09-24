@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: ghcr.io/gitrgoliveira/se-tool/sect:latest
@@ -13,7 +11,6 @@ services:
     environment:
       - STREAMLIT_SERVER_PORT=8501
       - OLLAMA_HOST=http://192.168.188.41:11434
-    command: streamlit run /app/streamlit_chat.py
 #  For Linux or Windows machines
     # deploy:
     #   resources:

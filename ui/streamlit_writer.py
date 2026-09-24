@@ -89,7 +89,7 @@ Please ensure the OKR is aligned with the main goals and priorities mentioned in
                 prompt_selected = prompt_selected[5:].lower()
              
         start_button = st.button("Process",
-                                 use_container_width=True,
+                                 width="stretch",
                                  type="primary",
                                  disabled=st.session_state.get("writing_disabled", False))
     

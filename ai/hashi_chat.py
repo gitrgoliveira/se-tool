@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-import logging
 from operator import itemgetter
 from typing import Optional
 
-from langchain.memory import ConversationSummaryMemory
+from langchain_classic.memory import ConversationSummaryMemory
 from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate, format_document
@@ -12,7 +11,7 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_ollama import ChatOllama
 
 import ai.hashi_prompts as hashi_prompts
-from ai.common import get_retriever, load_llm
+from ai.common import get_retriever, resolve_llm
 
 DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(template="{page_content}")
 def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"):
@@ -20,7 +19,7 @@ def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_s
     return document_separator.join(doc_strings)
 
 def retrieval_qa_chain(llm: ChatOllama, retriever: BaseRetriever| None, memory: ConversationSummaryMemory):
-    from langchain.chains.conversational_retrieval.prompts import (
+    from langchain_classic.chains.conversational_retrieval.prompts import (
         CONDENSE_QUESTION_PROMPT)
     from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
@@ -91,12 +90,7 @@ def retrieval_qa_chain(llm: ChatOllama, retriever: BaseRetriever| None, memory: 
 
 
 def get_hashi_chat(llm=None, callback_manager=None, extra_retriever: Optional[BaseRetriever] = None):
-    if llm == None:
-        logging.debug("Loading a new LLM")
-        loaded_llm = load_llm(callback_manager=callback_manager)
-    else:
-        logging.debug("Using the provided LLM")
-        loaded_llm=llm
+    loaded_llm = resolve_llm(llm, callback_manager)
         
     memory = ConversationSummaryMemory(
         llm=loaded_llm, memory_key="chat_history", return_messages=True,

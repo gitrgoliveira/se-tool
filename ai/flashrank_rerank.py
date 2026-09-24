@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
-from langchain.callbacks.manager import Callbacks
+from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor
 from langchain_core.documents import Document
-from pydantic import model_validator
+from pydantic import ConfigDict, model_validator
 
 if TYPE_CHECKING:
     from flashrank import Ranker, RerankRequest
@@ -33,9 +33,7 @@ class FlashrankRerank(BaseDocumentCompressor):
     cache_dir: Optional[str] = None
     """Directory to cache model files."""
 
-    class Config:
-        """Configuration for this pydantic object."""
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @model_validator(mode="before")
     def validate_environment(cls, values: Dict) -> Dict:
@@ -50,9 +48,8 @@ class FlashrankRerank(BaseDocumentCompressor):
 
         values["model"] = values.get("model", DEFAULT_MODEL_NAME)
         values["cache_dir"] = values.get("cache_dir", "/tmp")
-        values["client"] = values.get("client", 
-                                      Ranker(model_name=values["model"], cache_dir=values["cache_dir"])
-                                      )
+        if values.get("client") is None:
+            values["client"] = Ranker(model_name=values["model"], cache_dir=values["cache_dir"])
         return values
 
     def compress_documents(

@@ -1,16 +1,21 @@
 chromadb
+ddgs
 flashrank
 html2text
-langchain
+langchain-classic
 langchain-community
 langchain-chroma
 langchain-ollama
 langchain-experimental
+langchain-huggingface
 markdown
 markdownify
+msoffcrypto-tool
+nltk
 ollama
 openpyxl
 playwright
+python-docx
 python-pptx
 sentence_transformers
 streamlit
@@ -19,3 +24,4 @@ torch
 tqdm
 unstructured
 xlrd
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

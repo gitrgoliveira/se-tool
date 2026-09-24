@@ -19,11 +19,11 @@ def hashi_assistant():
 
     # Add a text input for the search query
     query = st.text_area("Enter your search query:", height=200)
-    logging.debug("assistant query:", query)
-    search_button = st.button("Search", use_container_width=True,
+    logging.debug("assistant query: %s", query)
+    search_button = st.button("Search", width="stretch",
                               type="primary",
                               disabled=st.session_state.get("search_button_disabled", False))
-    logging.debug("assistant button:", search_button)
+    logging.debug("assistant button: %s", search_button)
 
     # If a query has been entered, search the documents and display the results
     if search_button:

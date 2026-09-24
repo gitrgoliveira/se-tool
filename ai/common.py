@@ -6,12 +6,12 @@ from urllib.parse import urlparse
 
 import ollama
 from flashrank import Ranker
-from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors.base import (
+from langchain_classic.retrievers import ContextualCompressionRetriever
+from langchain_classic.retrievers.document_compressors.base import (
     DocumentCompressorPipeline)
-from langchain.retrievers.document_compressors.embeddings_filter import (
+from langchain_classic.retrievers.document_compressors.embeddings_filter import (
     EmbeddingsFilter)
-from langchain.retrievers.merger_retriever import MergerRetriever
+from langchain_classic.retrievers.merger_retriever import MergerRetriever
 from langchain_chroma import Chroma
 from langchain_community.document_transformers.embeddings_redundant_filter import (
     EmbeddingsRedundantFilter)
@@ -41,18 +41,27 @@ extra_files = "docs"
 CPU_THREADS = 16
 GPU_THREADS = 32
 DEFAULT_CACHE_DIR = "./cache"
+# context window used when the model does not report one
+DEFAULT_CTX = 2048
+# upper bound for the context window, as Ollama sizes its KV cache (memory) by num_ctx.
+# Override it with the LLM_MAX_CONTEXT environment variable.
+DEFAULT_MAX_CTX = 8192
 
 class ModelDownloader:
     _instance = None
     download_lock = threading.Lock()
     cli : ollama.Client
+    host : str
     
     def __new__(cls, host: str | None, *args, **kwargs):
-        if not cls._instance:
-            if host == "" or host == None:
-                host = os.getenv('OLLAMA_HOST', "http://localhost:11434")
-                host = check_ollama_host(host)
+        if host == "" or host == None:
+            host = os.getenv('OLLAMA_HOST', "http://localhost:11434")
+        host = check_ollama_host(host)
+        # the host can be changed in the UI, so the shared client follows the latest one
+        if not cls._instance or cls.host != host:
+            cls.host = host
             cls.cli = ollama.Client(host=host)
+        if not cls._instance:
             cls._instance = super(ModelDownloader, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
@@ -102,19 +111,20 @@ class ModelDownloader:
     
     @classmethod
     def get_ctx_from_llm(cls, llm_model: str) -> int:
+        """Return the context length the model supports."""
         try:
-            model_info = cls.cli.show(llm_model).get('model_info')
+            model_info = cls.cli.show(llm_model).modelinfo
             if model_info is not None:
                 for k in model_info:
                     if k.endswith("context_length"):
                         return int(model_info[k])
-                return 2048
+                return DEFAULT_CTX
             else:
                 logging.error(f"Model info not found for {llm_model}")
-                return 2048
+                return DEFAULT_CTX
         except Exception as e:
             logging.error(f"Error when getting context size for {llm_model}: {e}")
-            return 2048
+            return DEFAULT_CTX
  
  
  
@@ -144,22 +154,34 @@ def load_llm(llm_model: str = default_llm_model,
     logging.info(f"Loaded Ollama from {ollama_host}")
     md = ModelDownloader(host=ollama_host)
     md.download_model(llm_model)
+
+    max_ctx = int(os.getenv("LLM_MAX_CONTEXT", DEFAULT_MAX_CTX))
+    num_ctx = min(md.get_ctx_from_llm(llm_model), max_ctx)
+    logging.info(f"Using a {num_ctx} token context window for {llm_model}")
     
     return ChatOllama(
-        # base_url=ollama_host,
+        base_url=ollama_host,
         model=llm_model,
         mirostat=2,
         # num_gpu=GPU_THREADS,
         # num_thread=CPU_THREADS,
         temperature=temperature,
-        num_ctx=md.get_ctx_from_llm(llm_model),
+        num_ctx=num_ctx,
         num_predict = -1,
         # top_p=0.5,
         top_k=10,
         verbose=True,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         keep_alive="25m"
         )
+
+def resolve_llm(llm=None, callback_manager=None) -> ChatOllama:
+    """Return the given LLM, or load the default one."""
+    if llm is None:
+        logging.debug("Loading a new LLM")
+        return load_llm(callback_manager=callback_manager)
+    logging.debug("Using the provided LLM")
+    return llm
 
 def get_retriever_svm (documents, embeding_function):
     from langchain_community.retrievers.svm import SVMRetriever
@@ -171,11 +193,11 @@ def get_retriever_svm (documents, embeding_function):
     return retriever
 
 def get_retriever_parent (documents, embeding_function):
-    from langchain.retrievers import ParentDocumentRetriever
-    from langchain.storage import InMemoryStore
+    from langchain_classic.retrievers import ParentDocumentRetriever
+    from langchain_classic.storage import InMemoryStore
     from langchain_community.document_loaders import TextLoader
-    from langchain_community.vectorstores import InMemoryVectorStore
-    from langchain.retrievers.multi_vector import SearchType
+    from langchain_core.vectorstores import InMemoryVectorStore
+    from langchain_classic.retrievers.multi_vector import SearchType
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
     child_splitter = RecursiveCharacterTextSplitter(chunk_size=512)
@@ -219,13 +241,11 @@ def get_retriever_bm25(documents):
     return bm25_retriever
 
 def get_vectorstore_chroma(persist_directory, embedding_function):
-    # from chromadb.config import Settings
-    # client_settings = Settings()
-    vectorstore = Chroma(persist_directory=persist_directory, embedding_function=embedding_function)
-    if vectorstore._client_settings:
-        vectorstore._client_settings.anonymized_telemetry = False
-    # vectorstore._client_settings.chroma_product_telemetry_impl = ""
-    # vectorstore._client_settings.chroma_telemetry_impl = ""
+    from chromadb.config import Settings
+    client_settings = Settings(anonymized_telemetry=False)
+    vectorstore = Chroma(persist_directory=persist_directory,
+                         embedding_function=embedding_function,
+                         client_settings=client_settings)
     return vectorstore
 
 def get_retriever_chroma(vectorstore: VectorStore):
@@ -304,10 +324,9 @@ def get_filter_embedding():
     ModelDownloader(host=host).download_model(emebedding_model)    
     embedding = OllamaEmbeddings(
         base_url=host,
-        model = default_llm_model,
+        model = emebedding_model,
         num_gpu = GPU_THREADS,
         num_thread = CPU_THREADS,
-        show_progress = True,
         mirostat = 2,
         # num_ctx = 4096,
         temperature=0,
@@ -317,7 +336,7 @@ def get_filter_embedding():
     return embedding
 
 def get_hf_llm():
-    from langchain_community.llms import HuggingFacePipeline
+    from langchain_huggingface import HuggingFacePipeline
     hf = HuggingFacePipeline.from_model_id(
         model_id="rishiraj/CatPPT-base",
         task="text-generation",
@@ -344,8 +363,8 @@ def get_retriever(llm, use_filters=False, multi_query=False, extra_retriever: Op
     merger_retriever = MergerRetriever(retrievers=chroma_retrievers)
 
     if multi_query:
-        from langchain.retrievers.multi_query import MultiQueryRetriever
-        logging.getLogger("langchain.retrievers.multi_query").setLevel(logging.INFO)
+        from langchain_classic.retrievers.multi_query import MultiQueryRetriever
+        logging.getLogger("langchain_classic.retrievers.multi_query").setLevel(logging.INFO)
         retriever_from_llm = MultiQueryRetriever.from_llm(
             retriever=merger_retriever, llm=llm, include_original = True
         )
