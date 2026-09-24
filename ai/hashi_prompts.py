@@ -53,14 +53,19 @@ def search_prompt() -> ChatPromptTemplate:
 
 
 
-def agent_prompt() -> ChatPromptTemplate:
+def agent_prompt(has_rag: bool = True) -> ChatPromptTemplate:
+    if has_rag:
+        tool_guidance = "Always check the hashicorp_rag tool first, and only use the web tools when it does not have the answer. \n"
+    else:
+        tool_guidance = "Use the web tools to find the answer. \n"
+
     return ChatPromptTemplate.from_messages([
         (
             "system",
             (
                 "You are a friendly assistant for question-answering tasks and an expert in HashiCorp technology. \n"
                 "All questions are in the context of HashiCorp products. \n"
-                "Always check the hashicorp_rag tool first, and only use the web tools when it does not have the answer. \n"
+                + tool_guidance +
                 "If you don't know the answer, just say that you don't know. Keep the answer concise, in markdown format, and always add external references to your source of knowledge. \n"
             )
         ),

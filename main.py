@@ -74,7 +74,8 @@ def settings():
         
     model_list = get_model_list(ollama_host=ollama_host)
     index = 0
-    if 'llm_model' in st.session_state and model_list != []:
+    # the loaded model may have been removed from Ollama, or the host changed
+    if st.session_state.get('llm_model') in model_list:
         index = model_list.index(st.session_state['llm_model'])
             
     llm_model = st.selectbox("Select the language model",

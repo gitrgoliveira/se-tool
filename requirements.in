@@ -10,6 +10,7 @@ langchain-experimental
 langchain-huggingface
 markdown
 markdownify
+msoffcrypto-tool
 nltk
 ollama
 openpyxl

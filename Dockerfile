@@ -10,7 +10,8 @@ ADD requirements.streamlit.txt /app
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.streamlit.txt
 # Tokenizer data for the NLTK text splitter, in a system path the streamlit user can read
-RUN python -m nltk.downloader -d /usr/local/share/nltk_data punkt_tab
+RUN python -m nltk.downloader -d /usr/local/share/nltk_data punkt_tab && \
+    python -c "import nltk; nltk.data.find('tokenizers/punkt_tab/english/')"
 
 # Add the current directory contents into the container at /app
 ADD .streamlit/ /app/.streamlit

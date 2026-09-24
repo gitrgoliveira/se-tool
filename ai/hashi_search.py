@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import logging
 from operator import itemgetter
 
 from langchain_core.output_parsers import StrOutputParser
@@ -10,7 +9,7 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_ollama import ChatOllama
 
 import ai.hashi_prompts as hashi_prompts
-from ai.common import get_retriever, load_llm
+from ai.common import get_retriever, resolve_llm
 
 
 def simple_search(retrievers, query):
@@ -93,11 +92,7 @@ def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_s
     return document_separator.join(doc_strings)
 
 def get_hashi_search(llm=None, callback_manager=None, extra_retriever: BaseRetriever = None):
-    if llm == None:
-        logging.debug("Loading a new LLM")
-        loaded_llm = load_llm(callback_manager=callback_manager)
-    else:
-        loaded_llm=llm
+    loaded_llm = resolve_llm(llm, callback_manager)
         
     retriever = get_retriever(loaded_llm, use_filters=True, multi_query=True, extra_retriever=extra_retriever)
     

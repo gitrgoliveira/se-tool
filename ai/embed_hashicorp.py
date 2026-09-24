@@ -2,10 +2,9 @@
 
 import datetime
 import os
-import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor, Future, as_completed
-from logging import debug, error, info
+from logging import debug, error, info, warning
 from typing import List
 
 import torch
@@ -103,16 +102,25 @@ def split_text(chunks) -> List[Document]:
     return chunks
 
 nltk_data_lock = threading.Lock()
+nltk_data_ready = False
 
 def ensure_nltk_data():
     """NLTKTextSplitter needs the punkt_tab tokenizer data, which pip does not install."""
+    global nltk_data_ready
+    if nltk_data_ready:
+        return
     import nltk
     with nltk_data_lock:
+        if nltk_data_ready:
+            return
         try:
             nltk.data.find("tokenizers/punkt_tab")
+            nltk_data_ready = True
         except LookupError:
             info("Downloading NLTK punkt_tab tokenizer data")
-            if not nltk.download("punkt_tab", quiet=True):
+            if nltk.download("punkt_tab", quiet=True):
+                nltk_data_ready = True
+            else:
                 error("Could not download NLTK punkt_tab data. Run `python -m nltk.downloader punkt_tab`, "
                       "or set NLTK_ALLOW_PROXIED_URLOPEN=1 when behind a proxy.")
 
@@ -185,13 +193,20 @@ def load_documents_git(repo_path, repo_url=None):
     return chunks
 
   
+def get_device() -> str:
+    if torch.cuda.is_available():
+        return 'cuda'
+    if torch.backends.mps.is_available():
+        return 'mps'
+    # an NVIDIA driver without a usable GPU usually means it is too old for this PyTorch build
+    if torch.version.cuda is not None and os.path.exists("/proc/driver/nvidia/version"):
+        warning(f"An NVIDIA driver is installed but PyTorch (CUDA {torch.version.cuda}) cannot use the GPU, "
+                "so embeddings run on the CPU. Check that the driver supports this CUDA version.")
+    return 'cpu'
+
 def get_embedding():
     
-    model_kwargs = {'device': 'cpu'}
-    if torch.cuda.is_available():
-        model_kwargs = {'device': 'cuda'}
-    elif sys.platform == "darwin":
-        model_kwargs = {'device':'mps'}
+    model_kwargs = {'device': get_device()}
         
     encode_kwargs = {'normalize_embeddings': False}
     query_encode_kwargs = {**encode_kwargs, 'prompt': bge_query_instruction}
@@ -207,11 +222,7 @@ def get_embedding():
 
 def get_embedding_mistral():
     
-    model_kwargs = {'device': 'cpu'}
-    if torch.cuda.is_available():
-        model_kwargs = {'device': 'cuda'}
-    elif sys.platform == "darwin":
-        model_kwargs = {'device':'mps'}
+    model_kwargs = {'device': get_device()}
 
     encode_kwargs = {'normalize_embeddings': False}
     # e5-mistral ships named prompts; queries use the web search one, documents none

@@ -43,20 +43,25 @@ GPU_THREADS = 32
 DEFAULT_CACHE_DIR = "./cache"
 # context window used when the model does not report one
 DEFAULT_CTX = 2048
-# upper bound for the context window, as Ollama sizes its KV cache (memory) by num_ctx
-MAX_CTX = 8192
+# upper bound for the context window, as Ollama sizes its KV cache (memory) by num_ctx.
+# Override it with the LLM_MAX_CONTEXT environment variable.
+DEFAULT_MAX_CTX = 8192
 
 class ModelDownloader:
     _instance = None
     download_lock = threading.Lock()
     cli : ollama.Client
+    host : str
     
     def __new__(cls, host: str | None, *args, **kwargs):
-        if not cls._instance:
-            if host == "" or host == None:
-                host = os.getenv('OLLAMA_HOST', "http://localhost:11434")
-                host = check_ollama_host(host)
+        if host == "" or host == None:
+            host = os.getenv('OLLAMA_HOST', "http://localhost:11434")
+        host = check_ollama_host(host)
+        # the host can be changed in the UI, so the shared client follows the latest one
+        if not cls._instance or cls.host != host:
+            cls.host = host
             cls.cli = ollama.Client(host=host)
+        if not cls._instance:
             cls._instance = super(ModelDownloader, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
@@ -106,12 +111,13 @@ class ModelDownloader:
     
     @classmethod
     def get_ctx_from_llm(cls, llm_model: str) -> int:
+        """Return the context length the model supports."""
         try:
             model_info = cls.cli.show(llm_model).modelinfo
             if model_info is not None:
                 for k in model_info:
                     if k.endswith("context_length"):
-                        return min(int(model_info[k]), MAX_CTX)
+                        return int(model_info[k])
                 return DEFAULT_CTX
             else:
                 logging.error(f"Model info not found for {llm_model}")
@@ -148,15 +154,19 @@ def load_llm(llm_model: str = default_llm_model,
     logging.info(f"Loaded Ollama from {ollama_host}")
     md = ModelDownloader(host=ollama_host)
     md.download_model(llm_model)
+
+    max_ctx = int(os.getenv("LLM_MAX_CONTEXT", DEFAULT_MAX_CTX))
+    num_ctx = min(md.get_ctx_from_llm(llm_model), max_ctx)
+    logging.info(f"Using a {num_ctx} token context window for {llm_model}")
     
     return ChatOllama(
-        # base_url=ollama_host,
+        base_url=ollama_host,
         model=llm_model,
         mirostat=2,
         # num_gpu=GPU_THREADS,
         # num_thread=CPU_THREADS,
         temperature=temperature,
-        num_ctx=md.get_ctx_from_llm(llm_model),
+        num_ctx=num_ctx,
         num_predict = -1,
         # top_p=0.5,
         top_k=10,
@@ -164,6 +174,14 @@ def load_llm(llm_model: str = default_llm_model,
         callbacks=callback_manager,
         keep_alive="25m"
         )
+
+def resolve_llm(llm=None, callback_manager=None) -> ChatOllama:
+    """Return the given LLM, or load the default one."""
+    if llm is None:
+        logging.debug("Loading a new LLM")
+        return load_llm(callback_manager=callback_manager)
+    logging.debug("Using the provided LLM")
+    return llm
 
 def get_retriever_svm (documents, embeding_function):
     from langchain_community.retrievers.svm import SVMRetriever
