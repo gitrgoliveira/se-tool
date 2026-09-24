@@ -8,7 +8,7 @@ from ui.streamlit_shared import StreamHandler, display_result
 from langchain_community.chat_message_histories import (
     StreamlitChatMessageHistory,
 )
-from langchain.memory import ConversationSummaryMemory
+from langchain_classic.memory import ConversationSummaryMemory
 
 
 def hashi_chat():

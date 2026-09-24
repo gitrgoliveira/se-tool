@@ -4,7 +4,7 @@ import logging
 from operator import itemgetter
 from typing import Optional
 
-from langchain.memory import ConversationSummaryMemory
+from langchain_classic.memory import ConversationSummaryMemory
 from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate, format_document
@@ -20,7 +20,7 @@ def _combine_documents(docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_s
     return document_separator.join(doc_strings)
 
 def retrieval_qa_chain(llm: ChatOllama, retriever: BaseRetriever| None, memory: ConversationSummaryMemory):
-    from langchain.chains.conversational_retrieval.prompts import (
+    from langchain_classic.chains.conversational_retrieval.prompts import (
         CONDENSE_QUESTION_PROMPT)
     from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 

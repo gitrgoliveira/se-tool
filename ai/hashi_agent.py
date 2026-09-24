@@ -1,12 +1,13 @@
 from typing import List
 
-from langchain.agents import (AgentExecutor, AgentType, create_react_agent,
-                              create_self_ask_with_search_agent,
-                              create_structured_chat_agent, initialize_agent,
-                              load_tools)
-from langchain.agents.agent_toolkits.conversational_retrieval.tool import (
+from langchain_classic.agents import (AgentExecutor, AgentType,
+                                      create_react_agent,
+                                      create_self_ask_with_search_agent,
+                                      create_structured_chat_agent,
+                                      initialize_agent)
+from langchain_classic.agents.agent_toolkits.conversational_retrieval.tool import (
     create_retriever_tool)
-from langchain.memory import ConversationSummaryMemory
+from langchain_classic.memory import ConversationSummaryMemory
 from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
 from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchResults
 from langchain_community.tools.playwright.utils import (
@@ -20,8 +21,6 @@ from langchain_community.utils.ernie_functions import (
 from langchain_core.runnables import (RunnableLambda, RunnableParallel,
                                       RunnablePassthrough)
 from langchain_core.tools import Tool
-from langchain_core.utils.function_calling import (
-    convert_pydantic_to_openai_function, format_tool_to_openai_function)
 from pydantic import BaseModel, Field
 
 import ai.hashi_prompts as hashi_prompts

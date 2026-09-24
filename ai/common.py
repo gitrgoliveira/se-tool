@@ -6,12 +6,12 @@ from urllib.parse import urlparse
 
 import ollama
 from flashrank import Ranker
-from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors.base import (
+from langchain_classic.retrievers import ContextualCompressionRetriever
+from langchain_classic.retrievers.document_compressors.base import (
     DocumentCompressorPipeline)
-from langchain.retrievers.document_compressors.embeddings_filter import (
+from langchain_classic.retrievers.document_compressors.embeddings_filter import (
     EmbeddingsFilter)
-from langchain.retrievers.merger_retriever import MergerRetriever
+from langchain_classic.retrievers.merger_retriever import MergerRetriever
 from langchain_chroma import Chroma
 from langchain_community.document_transformers.embeddings_redundant_filter import (
     EmbeddingsRedundantFilter)
@@ -157,7 +157,7 @@ def load_llm(llm_model: str = default_llm_model,
         # top_p=0.5,
         top_k=10,
         verbose=True,
-        callback_manager=callback_manager,
+        callbacks=callback_manager,
         keep_alive="25m"
         )
 
@@ -171,11 +171,11 @@ def get_retriever_svm (documents, embeding_function):
     return retriever
 
 def get_retriever_parent (documents, embeding_function):
-    from langchain.retrievers import ParentDocumentRetriever
-    from langchain.storage import InMemoryStore
+    from langchain_classic.retrievers import ParentDocumentRetriever
+    from langchain_classic.storage import InMemoryStore
     from langchain_community.document_loaders import TextLoader
     from langchain_community.vectorstores import InMemoryVectorStore
-    from langchain.retrievers.multi_vector import SearchType
+    from langchain_classic.retrievers.multi_vector import SearchType
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
     child_splitter = RecursiveCharacterTextSplitter(chunk_size=512)
@@ -219,13 +219,11 @@ def get_retriever_bm25(documents):
     return bm25_retriever
 
 def get_vectorstore_chroma(persist_directory, embedding_function):
-    # from chromadb.config import Settings
-    # client_settings = Settings()
-    vectorstore = Chroma(persist_directory=persist_directory, embedding_function=embedding_function)
-    if vectorstore._client_settings:
-        vectorstore._client_settings.anonymized_telemetry = False
-    # vectorstore._client_settings.chroma_product_telemetry_impl = ""
-    # vectorstore._client_settings.chroma_telemetry_impl = ""
+    from chromadb.config import Settings
+    client_settings = Settings(anonymized_telemetry=False)
+    vectorstore = Chroma(persist_directory=persist_directory,
+                         embedding_function=embedding_function,
+                         client_settings=client_settings)
     return vectorstore
 
 def get_retriever_chroma(vectorstore: VectorStore):
@@ -307,7 +305,6 @@ def get_filter_embedding():
         model = default_llm_model,
         num_gpu = GPU_THREADS,
         num_thread = CPU_THREADS,
-        show_progress = True,
         mirostat = 2,
         # num_ctx = 4096,
         temperature=0,
@@ -344,8 +341,8 @@ def get_retriever(llm, use_filters=False, multi_query=False, extra_retriever: Op
     merger_retriever = MergerRetriever(retrievers=chroma_retrievers)
 
     if multi_query:
-        from langchain.retrievers.multi_query import MultiQueryRetriever
-        logging.getLogger("langchain.retrievers.multi_query").setLevel(logging.INFO)
+        from langchain_classic.retrievers.multi_query import MultiQueryRetriever
+        logging.getLogger("langchain_classic.retrievers.multi_query").setLevel(logging.INFO)
         retriever_from_llm = MultiQueryRetriever.from_llm(
             retriever=merger_retriever, llm=llm, include_original = True
         )

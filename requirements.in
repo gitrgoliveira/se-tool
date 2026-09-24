@@ -1,13 +1,14 @@
 chromadb
 flashrank
 html2text
-langchain
+langchain-classic
 langchain-community
 langchain-chroma
 langchain-ollama
 langchain-experimental
 markdown
 markdownify
+nltk
 ollama
 openpyxl
 playwright

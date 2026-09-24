@@ -60,7 +60,7 @@ def settings():
     with col1:
         pull_model = st.text_input("Pull model", placeholder="model to pull", label_visibility="collapsed")
     with col2:
-        pull_button = st.button("Pull", type="secondary", use_container_width=True)
+        pull_button = st.button("Pull", type="secondary", width="stretch")
         
     if pull_button:
         try:
@@ -83,11 +83,11 @@ def settings():
                                      index=index)
 
     temperature = st.slider("Less or more creative?", min_value=0.0, max_value=1.0, value=0.1, step=.1)
-    load_llm_button = st.button("Load model", use_container_width=True, type="primary")
+    load_llm_button = st.button("Load model", width="stretch", type="primary")
     reload_extra_docs_disabled = False
     if st.session_state.get('llm', None) == None or load_llm_button:
         reload_extra_docs_disabled = True
-    reload_extra_docs = st.button("Reload extra docs", use_container_width=True, type="secondary", disabled=reload_extra_docs_disabled)    
+    reload_extra_docs = st.button("Reload extra docs", width="stretch", type="secondary", disabled=reload_extra_docs_disabled)    
     
     if reload_extra_docs:
         with st.spinner("Reloading extra docs..."):

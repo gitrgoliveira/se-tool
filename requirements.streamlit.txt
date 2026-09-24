@@ -4,495 +4,501 @@
 #
 #    pip-compile --output-file=requirements.streamlit.txt requirements.in
 #
-aiofiles==24.1.0
+aiofiles==25.1.0
     # via unstructured-client
-aiohappyeyeballs==2.4.4
+aiohappyeyeballs==2.7.1
     # via aiohttp
-aiohttp==3.11.11
+aiohttp==3.14.3
     # via
-    #   langchain
+    #   kubernetes
     #   langchain-community
-aiosignal==1.3.2
+aiosignal==1.4.0
     # via aiohttp
-altair==5.5.0
+altair==6.3.0
     # via streamlit
-annotated-types==0.7.0
+annotated-doc==0.0.5
+    # via typer
+annotated-types==0.8.0
     # via pydantic
-anyio==4.8.0
+anyio==4.15.1
     # via
     #   httpx
+    #   httpx2
+    #   langsmith
     #   starlette
+    #   streamlit
     #   watchfiles
-asgiref==3.8.1
-    # via opentelemetry-instrumentation-asgi
-attrs==24.3.0
+attrs==26.1.0
     # via
     #   aiohttp
     #   jsonschema
     #   referencing
-backoff==2.2.1
-    # via
-    #   posthog
-    #   unstructured
-bcrypt==4.2.1
+bcrypt==5.0.0
     # via chromadb
-beautifulsoup4==4.12.3
+beautifulsoup4==4.15.0
     # via
     #   markdownify
     #   unstructured
-blinker==1.9.0
-    # via streamlit
-build==1.2.2.post1
+blis==1.3.3
+    # via thinc
+build==1.6.1
     # via chromadb
-cachetools==5.5.0
+catalogue==2.0.10
     # via
-    #   google-auth
-    #   streamlit
-certifi==2024.12.14
+    #   spacy
+    #   srsly
+    #   thinc
+certifi==2026.7.22
     # via
     #   httpcore
     #   httpx
     #   kubernetes
     #   requests
-cffi==1.17.1
-    # via cryptography
-chardet==5.2.0
-    # via unstructured
-charset-normalizer==3.4.1
-    # via requests
-chroma-hnswlib==0.7.6
-    # via chromadb
-chromadb==0.5.23
+charset-normalizer==3.5.1
+    # via
+    #   requests
+    #   unstructured
+chromadb==1.5.9
     # via
     #   -r requirements.in
     #   langchain-chroma
-click==8.1.8
+click==8.5.0
     # via
+    #   huggingface-hub
     #   nltk
     #   python-oxmsg
+    #   spacy
     #   streamlit
-    #   typer
     #   uvicorn
-coloredlogs==15.0.1
-    # via onnxruntime
-cryptography==44.0.1
-    # via unstructured-client
-dataclasses-json==0.6.7
+cloudpathlib==0.25.0
+    # via weasel
+cloudpickle==3.1.2
+    # via joblib
+confection==1.3.3
     # via
-    #   langchain-community
-    #   unstructured
-deprecated==1.2.15
+    #   spacy
+    #   thinc
+    #   weasel
+cuda-bindings==13.4.3
+    # via torch
+cuda-pathfinder==1.8.2
+    # via cuda-bindings
+cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3.0
+    # via torch
+cymem==2.0.13
     # via
-    #   opentelemetry-api
-    #   opentelemetry-exporter-otlp-proto-grpc
-    #   opentelemetry-semantic-conventions
-durationpy==0.9
+    #   preshed
+    #   spacy
+    #   thinc
+defusedxml==0.7.1
+    # via nltk
+distro==1.9.0
+    # via langsmith
+durationpy==0.11
     # via kubernetes
-emoji==2.14.0
+emoji==2.16.0
     # via unstructured
 et-xmlfile==2.0.0
     # via openpyxl
-eval-type-backport==0.2.2
-    # via unstructured-client
-fastapi==0.115.6
-    # via
-    #   chromadb
-    #   langchain-chroma
-filelock==3.16.1
+filelock==3.32.7
     # via
     #   huggingface-hub
     #   torch
-    #   transformers
-    #   triton
+    #   unstructured
 filetype==1.2.0
     # via unstructured
 flashrank==0.2.10
     # via -r requirements.in
-flatbuffers==24.12.23
+flatbuffers==25.12.19
     # via onnxruntime
-frozenlist==1.5.0
+frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
-fsspec==2024.12.0
+fsspec==2026.9.0
     # via
     #   huggingface-hub
     #   torch
-gitdb==4.0.12
-    # via gitpython
-gitpython==3.1.44
-    # via streamlit
-google-auth==2.37.0
-    # via kubernetes
-googleapis-common-protos==1.66.0
+googleapis-common-protos==1.75.3
     # via opentelemetry-exporter-otlp-proto-grpc
-greenlet==3.1.1
+greenlet==3.5.6
     # via
     #   playwright
     #   sqlalchemy
-grpcio==1.69.0
+grpcio==1.84.0
     # via
     #   chromadb
     #   opentelemetry-exporter-otlp-proto-grpc
-h11==0.14.0
+h11==0.16.0
     # via
     #   httpcore
+    #   httpcore2
     #   uvicorn
-html2text==2024.2.26
+hf-xet==1.6.0
+    # via huggingface-hub
+html2text==2025.4.15
     # via -r requirements.in
 html5lib==1.1
     # via unstructured
-httpcore==1.0.7
-    # via httpx
-httptools==0.6.4
-    # via uvicorn
-httpx==0.27.2
+httpcore==1.0.9
+    # via
+    #   httpx
+    #   unstructured-client
+httpcore2==2.13.1
+    # via httpx2
+httptools==0.8.0
+    # via
+    #   streamlit
+    #   uvicorn
+httpx==0.28.1
     # via
     #   chromadb
-    #   langsmith
+    #   huggingface-hub
+    #   langchain-core
     #   ollama
     #   unstructured-client
-httpx-sse==0.4.0
+    #   weasel
+httpx-sse==0.4.3
     # via langchain-community
-huggingface-hub==0.27.1
+httpx2==2.13.1
+    # via langsmith
+huggingface-hub==1.33.0
     # via
     #   sentence-transformers
     #   tokenizers
     #   transformers
-humanfriendly==10.0
-    # via coloredlogs
-idna==3.10
+idna==3.20
     # via
     #   anyio
     #   httpx
+    #   httpx2
     #   requests
     #   yarl
-importlib-metadata==8.5.0
-    # via opentelemetry-api
-importlib-resources==6.5.2
+importlib-resources==7.1.0
     # via chromadb
-jinja2==3.1.5
+installer==0.7.0
+    # via unstructured
+itsdangerous==2.2.0
+    # via streamlit
+jinja2==3.1.6
     # via
     #   altair
     #   pydeck
+    #   spacy
     #   torch
-joblib==1.4.2
+joblib==1.6.0
     # via
     #   nltk
     #   scikit-learn
 jsonpatch==1.33
     # via langchain-core
-jsonpath-python==1.0.6
-    # via unstructured-client
-jsonpointer==3.0.0
+jsonpointer==3.1.1
     # via jsonpatch
-jsonschema==4.23.0
-    # via altair
-jsonschema-specifications==2024.10.1
+jsonschema==4.26.0
+    # via
+    #   altair
+    #   chromadb
+jsonschema-specifications==2025.9.1
     # via jsonschema
-kubernetes==31.0.0
+kubernetes==36.0.3
     # via chromadb
-langchain==0.3.14
+langchain-chroma==1.1.0
+    # via -r requirements.in
+langchain-classic==1.0.8
     # via
     #   -r requirements.in
     #   langchain-community
-langchain-chroma==0.1.4
-    # via -r requirements.in
-langchain-community==0.3.14
+langchain-community==0.4.2
     # via
     #   -r requirements.in
     #   langchain-experimental
-langchain-core==0.3.29
+langchain-core==1.6.4
     # via
-    #   langchain
     #   langchain-chroma
+    #   langchain-classic
     #   langchain-community
     #   langchain-experimental
     #   langchain-ollama
     #   langchain-text-splitters
-langchain-experimental==0.3.4
+langchain-experimental==0.4.2
     # via -r requirements.in
-langchain-ollama==0.2.2
+langchain-ollama==1.1.0
     # via -r requirements.in
-langchain-text-splitters==0.3.5
-    # via langchain
+langchain-protocol==0.0.19
+    # via langchain-core
+langchain-text-splitters==1.1.2
+    # via langchain-classic
 langdetect==1.0.9
     # via unstructured
-langsmith==0.2.10
+langsmith==0.14.0
     # via
-    #   langchain
+    #   langchain-classic
     #   langchain-community
     #   langchain-core
-lxml==5.3.0
+llvmlite==0.49.0
+    # via numba
+lxml==6.1.3
     # via
     #   python-pptx
     #   unstructured
-markdown==3.7
+markdown==3.10.3
     # via -r requirements.in
-markdown-it-py==3.0.0
+markdown-it-py==4.2.0
     # via rich
-markdownify==0.14.1
+markdownify==1.2.3
     # via -r requirements.in
-markupsafe==3.0.2
+markupsafe==3.0.3
     # via jinja2
-marshmallow==3.24.1
-    # via dataclasses-json
 mdurl==0.1.2
     # via markdown-it-py
-mmh3==5.0.1
+mmh3==5.3.0
     # via chromadb
-monotonic==1.6
-    # via posthog
 mpmath==1.3.0
     # via sympy
-multidict==6.1.0
+multidict==6.9.1
     # via
     #   aiohttp
     #   yarl
-mypy-extensions==1.0.0
-    # via typing-inspect
-narwhals==1.21.1
-    # via altair
-ndjson==0.3.1
-    # via unstructured
-nest-asyncio==1.6.0
-    # via unstructured-client
-networkx==3.4.2
-    # via torch
-nltk==3.9.1
-    # via unstructured
-numpy==1.26.4
+murmurhash==1.0.15
     # via
-    #   chroma-hnswlib
+    #   preshed
+    #   spacy
+    #   thinc
+narwhals==2.26.0
+    # via
+    #   altair
+    #   scikit-learn
+networkx==3.6.1
+    # via torch
+nh3==0.3.7
+    # via unstructured
+nltk==3.10.3
+    # via -r requirements.in
+numba==0.67.0
+    # via unstructured
+numpy==2.4.6
+    # via
+    #   blis
     #   chromadb
     #   flashrank
-    #   langchain
     #   langchain-chroma
     #   langchain-community
+    #   numba
     #   onnxruntime
     #   pandas
     #   pydeck
     #   scikit-learn
     #   scipy
+    #   sentence-transformers
+    #   spacy
     #   streamlit
+    #   thinc
     #   transformers
     #   unstructured
-nvidia-cublas-cu12==12.4.5.8
+nvidia-cublas==13.1.1.3
     # via
-    #   nvidia-cudnn-cu12
-    #   nvidia-cusolver-cu12
-    #   torch
-nvidia-cuda-cupti-cu12==12.4.127
-    # via torch
-nvidia-cuda-nvrtc-cu12==12.4.127
-    # via torch
-nvidia-cuda-runtime-cu12==12.4.127
-    # via torch
-nvidia-cudnn-cu12==9.1.0.70
-    # via torch
-nvidia-cufft-cu12==11.2.1.3
-    # via torch
-nvidia-curand-cu12==10.3.5.147
-    # via torch
-nvidia-cusolver-cu12==11.6.1.9
-    # via torch
-nvidia-cusparse-cu12==12.3.1.170
+    #   cuda-toolkit
+    #   nvidia-cudnn-cu13
+    #   nvidia-cusolver
+nvidia-cuda-cupti==13.0.85
+    # via cuda-toolkit
+nvidia-cuda-nvrtc==13.0.88
     # via
-    #   nvidia-cusolver-cu12
-    #   torch
-nvidia-nccl-cu12==2.21.5
+    #   cuda-toolkit
+    #   nvidia-cublas
+nvidia-cuda-runtime==13.0.96
+    # via cuda-toolkit
+nvidia-cudnn-cu13==9.24.0.43
     # via torch
-nvidia-nvjitlink-cu12==12.4.127
+nvidia-cufft==12.0.0.61
+    # via cuda-toolkit
+nvidia-cufile==1.15.1.6
+    # via cuda-toolkit
+nvidia-curand==10.4.0.35
+    # via cuda-toolkit
+nvidia-cusolver==12.0.4.66
+    # via cuda-toolkit
+nvidia-cusparse==12.6.3.3
     # via
-    #   nvidia-cusolver-cu12
-    #   nvidia-cusparse-cu12
-    #   torch
-nvidia-nvtx-cu12==12.4.127
+    #   cuda-toolkit
+    #   nvidia-cusolver
+nvidia-cusparselt-cu13==0.8.1
     # via torch
-oauthlib==3.2.2
+nvidia-nccl-cu13==2.30.7
+    # via torch
+nvidia-nvjitlink==13.4.92
     # via
-    #   kubernetes
-    #   requests-oauthlib
+    #   cuda-toolkit
+    #   nvidia-cufft
+    #   nvidia-cusolver
+    #   nvidia-cusparse
+nvidia-nvshmem-cu13==3.4.5
+    # via torch
+nvidia-nvtx==13.0.85
+    # via cuda-toolkit
+oauthlib==3.3.1
+    # via requests-oauthlib
 olefile==0.47
     # via python-oxmsg
-ollama==0.4.5
+ollama==0.6.2
     # via
     #   -r requirements.in
     #   langchain-ollama
-onnxruntime==1.20.1
+onnxruntime==1.30.0
     # via
     #   chromadb
     #   flashrank
 openpyxl==3.1.5
     # via -r requirements.in
-opentelemetry-api==1.29.0
+opentelemetry-api==1.44.0
     # via
     #   chromadb
     #   opentelemetry-exporter-otlp-proto-grpc
-    #   opentelemetry-instrumentation
-    #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
-opentelemetry-exporter-otlp-proto-common==1.29.0
+opentelemetry-exporter-otlp-proto-common==1.44.0
     # via opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-exporter-otlp-proto-grpc==1.29.0
+opentelemetry-exporter-otlp-proto-grpc==1.44.0
     # via chromadb
-opentelemetry-instrumentation==0.50b0
-    # via
-    #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-fastapi
-opentelemetry-instrumentation-asgi==0.50b0
-    # via opentelemetry-instrumentation-fastapi
-opentelemetry-instrumentation-fastapi==0.50b0
-    # via chromadb
-opentelemetry-proto==1.29.0
+opentelemetry-proto==1.44.0
     # via
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-sdk==1.29.0
+opentelemetry-sdk==1.44.0
     # via
     #   chromadb
     #   opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-semantic-conventions==0.50b0
-    # via
-    #   opentelemetry-instrumentation
-    #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-fastapi
-    #   opentelemetry-sdk
-opentelemetry-util-http==0.50b0
-    # via
-    #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-fastapi
-orjson==3.10.13
+opentelemetry-semantic-conventions==0.65b0
+    # via opentelemetry-sdk
+orjson==3.12.0
     # via
     #   chromadb
     #   langsmith
 overrides==7.7.0
     # via chromadb
-packaging==24.2
+packaging==26.3
     # via
     #   altair
     #   build
     #   huggingface-hub
     #   langchain-core
-    #   marshmallow
+    #   langsmith
     #   onnxruntime
-    #   opentelemetry-instrumentation
+    #   spacy
     #   streamlit
+    #   thinc
     #   transformers
-pandas==2.2.3
+    #   weasel
+pandas==3.0.6
     # via streamlit
-pillow==11.1.0
+pillow==12.3.0
     # via
     #   python-pptx
-    #   sentence-transformers
     #   streamlit
-playwright==1.49.1
+playwright==1.63.0
     # via -r requirements.in
-posthog==3.7.5
-    # via chromadb
-propcache==0.2.1
+preshed==3.0.13
+    # via
+    #   spacy
+    #   thinc
+propcache==0.5.4
     # via
     #   aiohttp
     #   yarl
-protobuf==5.29.2
+protobuf==7.36.2
     # via
     #   googleapis-common-protos
     #   onnxruntime
     #   opentelemetry-proto
     #   streamlit
-psutil==6.1.1
+psutil==7.2.2
     # via unstructured
-pyarrow==18.1.0
+pyarrow==25.0.1
     # via streamlit
-pyasn1==0.6.1
-    # via
-    #   pyasn1-modules
-    #   rsa
-pyasn1-modules==0.4.1
-    # via google-auth
-pycparser==2.22
-    # via cffi
-pydantic==2.9.2
+pybase64==1.5.0
+    # via chromadb
+pydantic==2.13.5
     # via
     #   chromadb
-    #   fastapi
-    #   langchain
+    #   langchain-classic
     #   langchain-core
     #   langsmith
     #   ollama
     #   pydantic-settings
+    #   spacy
+    #   thinc
     #   unstructured-client
-pydantic-core==2.23.4
+    #   weasel
+pydantic-core==2.46.5
     # via pydantic
-pydantic-settings==2.7.1
-    # via langchain-community
-pydeck==0.9.1
+pydantic-settings==2.15.0
+    # via
+    #   chromadb
+    #   langchain-community
+pydeck==0.9.3
     # via streamlit
-pyee==12.0.0
+pyee==13.0.1
     # via playwright
-pygments==2.19.1
+pygments==2.21.0
     # via rich
-pypdf==5.1.0
+pypdf==6.19.0
     # via unstructured-client
-pypika==0.48.9
+pypdfium2==5.13.0
+    # via unstructured-client
+pypika==0.51.1
     # via chromadb
-pyproject-hooks==1.2.0
+pyproject-hooks==1.3.3
     # via build
 python-dateutil==2.9.0.post0
     # via
     #   kubernetes
     #   pandas
-    #   posthog
-    #   unstructured-client
-python-dotenv==1.0.1
+python-dotenv==1.2.3
     # via
     #   pydantic-settings
     #   uvicorn
-python-iso639==2024.10.22
+python-iso639==2026.7.23
     # via unstructured
 python-magic==0.4.27
     # via unstructured
-python-oxmsg==0.0.1
+python-multipart==0.0.32
+    # via streamlit
+python-oxmsg==0.0.2
     # via unstructured
 python-pptx==1.0.2
     # via -r requirements.in
-pytz==2024.2
-    # via pandas
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via
     #   chromadb
     #   huggingface-hub
     #   kubernetes
-    #   langchain
+    #   langchain-classic
     #   langchain-community
     #   langchain-core
     #   transformers
     #   uvicorn
-rapidfuzz==3.11.0
+rapidfuzz==3.14.6
     # via unstructured
-referencing==0.35.1
+referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.11.6
+regex==2026.9.10
     # via
     #   nltk
     #   transformers
-requests==2.32.3
+    #   unstructured
+requests==2.34.2
     # via
     #   flashrank
-    #   huggingface-hub
     #   kubernetes
-    #   langchain
+    #   langchain-classic
     #   langchain-community
     #   langsmith
-    #   posthog
     #   requests-oauthlib
     #   requests-toolbelt
+    #   spacy
     #   streamlit
-    #   transformers
     #   unstructured
 requests-oauthlib==2.0.0
     # via kubernetes
@@ -500,26 +506,23 @@ requests-toolbelt==1.0.0
     # via
     #   langsmith
     #   unstructured-client
-rich==13.9.4
+rich==15.0.0
     # via
     #   chromadb
-    #   streamlit
     #   typer
-rpds-py==0.22.3
+rpds-py==2026.6.3
     # via
     #   jsonschema
     #   referencing
-rsa==4.9
-    # via google-auth
-safetensors==0.5.1
+safetensors==0.8.0
     # via transformers
-scikit-learn==1.6.0
+scikit-learn==1.9.1
     # via sentence-transformers
-scipy==1.15.0
+scipy==1.17.1
     # via
     #   scikit-learn
     #   sentence-transformers
-sentence-transformers==3.3.1
+sentence-transformers==6.1.0
     # via -r requirements.in
 shellingham==1.5.4
     # via typer
@@ -529,55 +532,60 @@ six==1.17.0
     #   kubernetes
     #   langdetect
     #   markdownify
-    #   posthog
     #   python-dateutil
-smmap==5.0.2
-    # via gitdb
+smart-open==8.0.1
+    # via weasel
 sniffio==1.3.1
-    # via
-    #   anyio
-    #   httpx
-soupsieve==2.6
+    # via langsmith
+soupsieve==2.10
     # via beautifulsoup4
-sqlalchemy==2.0.36
+spacy==3.8.16
+    # via unstructured
+spacy-legacy==3.0.12
+    # via spacy
+spacy-loggers==1.0.5
+    # via spacy
+sqlalchemy==2.0.54
     # via
-    #   langchain
+    #   langchain-classic
     #   langchain-community
-starlette==0.41.3
-    # via fastapi
-streamlit==1.41.1
+srsly==2.5.3
+    # via
+    #   spacy
+    #   thinc
+    #   weasel
+starlette==1.7.0
+    # via streamlit
+streamlit==1.64.0
     # via
     #   -r requirements.in
     #   streamlit-quill
 streamlit-quill==0.0.3
     # via -r requirements.in
-sympy==1.13.1
-    # via
-    #   onnxruntime
-    #   torch
-tenacity==9.0.0
+sympy==1.14.0
+    # via torch
+tenacity==9.1.4
     # via
     #   chromadb
-    #   langchain
     #   langchain-community
     #   langchain-core
-    #   streamlit
-threadpoolctl==3.5.0
+thinc==8.3.13
+    # via spacy
+threadpoolctl==3.7.0
     # via scikit-learn
-tokenizers==0.20.3
+tokenizers==0.23.2
     # via
     #   chromadb
     #   flashrank
+    #   sentence-transformers
     #   transformers
 toml==0.10.2
     # via streamlit
-torch==2.5.1
+torch==2.14.0
     # via
     #   -r requirements.in
     #   sentence-transformers
-tornado==6.4.2
-    # via streamlit
-tqdm==4.67.1
+tqdm==4.70.1
     # via
     #   -r requirements.in
     #   chromadb
@@ -585,72 +593,110 @@ tqdm==4.67.1
     #   huggingface-hub
     #   nltk
     #   sentence-transformers
+    #   spacy
     #   transformers
     #   unstructured
-transformers==4.46.3
+transformers==5.17.0
     # via sentence-transformers
-triton==3.1.0
+triton==3.8.0
     # via torch
-typer==0.15.1
-    # via chromadb
-typing-extensions==4.12.2
+truststore==0.10.4
     # via
+    #   httpcore2
+    #   httpx2
+typer==0.27.2
+    # via
+    #   chromadb
+    #   spacy
+    #   transformers
+    #   weasel
+typing-extensions==4.16.0
+    # via
+    #   aiohttp
+    #   aiosignal
     #   altair
     #   anyio
+    #   beautifulsoup4
     #   chromadb
-    #   fastapi
+    #   grpcio
+    #   httpx2
     #   huggingface-hub
     #   langchain-core
+    #   langchain-protocol
+    #   langsmith
+    #   opentelemetry-api
+    #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-sdk
+    #   opentelemetry-semantic-conventions
     #   pydantic
     #   pydantic-core
     #   pyee
     #   python-oxmsg
     #   python-pptx
+    #   referencing
+    #   sentence-transformers
     #   sqlalchemy
+    #   starlette
     #   streamlit
     #   torch
-    #   typer
-    #   typing-inspect
+    #   typing-inspection
     #   unstructured
-typing-inspect==0.9.0
+typing-inspection==0.4.4
     # via
-    #   dataclasses-json
-    #   unstructured-client
-tzdata==2024.2
-    # via pandas
-unstructured==0.16.12
+    #   pydantic
+    #   pydantic-settings
+unstructured==0.27.8
     # via -r requirements.in
-unstructured-client==0.28.1
+unstructured-client==0.46.2
     # via unstructured
-urllib3==2.3.0
+urllib3==2.8.0
     # via
     #   kubernetes
     #   requests
-uvicorn[standard]==0.34.0
-    # via chromadb
-uvloop==0.21.0
+uuid-utils==0.17.1
+    # via
+    #   langchain-core
+    #   langsmith
+uvicorn[standard]==0.53.0
+    # via
+    #   chromadb
+    #   streamlit
+uvloop==0.22.1
     # via uvicorn
+wasabi==1.1.3
+    # via
+    #   spacy
+    #   thinc
+    #   weasel
 watchdog==6.0.0
     # via streamlit
-watchfiles==1.0.3
+watchfiles==1.3.0
     # via uvicorn
-webencodings==0.5.1
+weasel==1.0.0
+    # via spacy
+webencodings==0.6.1
     # via html5lib
-websocket-client==1.8.0
+websocket-client==1.9.2
     # via kubernetes
-websockets==14.1
-    # via uvicorn
-wrapt==1.17.0
+websockets==16.1.1
     # via
-    #   deprecated
-    #   opentelemetry-instrumentation
+    #   langsmith
+    #   streamlit
+    #   uvicorn
+wrapt==2.4.1
+    # via
+    #   smart-open
     #   unstructured
-xlrd==2.0.1
+xlrd==2.0.2
     # via -r requirements.in
-xlsxwriter==3.2.0
+xlsxwriter==3.2.9
     # via python-pptx
-yarl==1.18.3
+xxhash==4.0.1
+    # via langsmith
+yarl==1.25.1
     # via aiohttp
-zipp==3.21.0
-    # via importlib-metadata
+zstandard==0.25.0
+    # via langsmith
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

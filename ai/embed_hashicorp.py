@@ -9,7 +9,7 @@ from typing import List
 
 import torch
 from dateutil.relativedelta import relativedelta
-from langchain.indexes import SQLRecordManager, index
+from langchain_classic.indexes import SQLRecordManager, index
 from langchain_chroma import Chroma
 from langchain_community.document_loaders.directory import DirectoryLoader
 from langchain_community.document_loaders.text import TextLoader

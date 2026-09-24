@@ -23,7 +23,7 @@ def add_playground():
                  
     start_button = st.button("Process",
                              key="pg_start_button",
-                            use_container_width=True,
+                            width="stretch",
                             type="primary",
                             disabled=st.session_state.get("writing_disabled", False))
     

@@ -14,11 +14,11 @@ from ai.common import get_retriever, load_llm
 
 
 def simple_search(retrievers, query):
-    from langchain.retrievers import EnsembleRetriever
+    from langchain_classic.retrievers import EnsembleRetriever
     n_retrievers = len(retrievers)
     weights = [1 / n_retrievers] * n_retrievers
     ensemble_retriever = EnsembleRetriever(retrievers=retrievers, weights=weights)
-    return ensemble_retriever.get_relevant_documents(query)
+    return ensemble_retriever.invoke(query)
 
 
 def retrieval_search_chain(llm: ChatOllama, retriever):
