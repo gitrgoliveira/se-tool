@@ -8,7 +8,7 @@ aiofiles==25.1.0
     # via unstructured-client
 aiohappyeyeballs==2.7.1
     # via aiohttp
-aiohttp==3.14.4
+aiohttp==3.14.5
     # via
     #   kubernetes
     #   langchain-community
@@ -48,7 +48,7 @@ catalogue==2.0.10
     #   spacy
     #   srsly
     #   thinc
-certifi==2026.7.22
+certifi==2026.10.19
     # via
     #   httpcore
     #   httpx
@@ -289,7 +289,7 @@ networkx==3.6.1
     # via torch
 nh3==0.3.7
     # via unstructured
-nltk==3.10.3
+nltk==3.10.4
     # via -r requirements.in
 numba==0.67.0
     # via unstructured
@@ -464,7 +464,7 @@ pyee==13.0.1
     # via playwright
 pygments==2.21.0
     # via rich
-pypdf==6.19.0
+pypdf==6.21.1
     # via unstructured-client
 pypdfium2==5.13.0
     # via unstructured-client
