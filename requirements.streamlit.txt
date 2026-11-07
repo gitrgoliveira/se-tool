@@ -464,7 +464,7 @@ pyee==13.0.1
     # via playwright
 pygments==2.21.0
     # via rich
-pypdf==6.21.1
+pypdf==6.21.4
     # via unstructured-client
 pypdfium2==5.13.0
     # via unstructured-client
